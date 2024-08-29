@@ -1,24 +1,32 @@
 import { createRouter, createWebHistory } from 'vue-router';
-
-// Import components from the correct path
 import LoginPage from '../views/Login.vue';
+import Discover from '@/views/Discover.vue';
+import Cart from '@/views/Cart.vue'; // Import the Cart component
 
-
-// Define your routes
 const routes = [
   {
     path: '/login',
     name: 'Login',
     component: LoginPage,
-    // No authentication required for the login page
+  },
+  {
+    path: '/discover',
+    name: 'Discover',
+    component: Discover,
+  },
+  {
+    path: '/cart',
+    name: 'Cart',
+    component: Cart, // Add the Cart route
   }
 ];
 
-// Create the router instance
 const router = createRouter({
   history: createWebHistory(),
   routes,
 });
+
+
 
 // Navigation guard to check authentication
 router.beforeEach((to, from, next) => {
