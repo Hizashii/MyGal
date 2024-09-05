@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from 'vue-router';
 import LoginPage from '../views/Login.vue';
 import Discover from '@/views/Discover.vue';
 import Cart from '@/views/Cart.vue'; // Import the Cart component
-
+import Profile from '@/views/Profile.vue'; // Import the Profile component
 const routes = [
   {
     path: '/login',
@@ -17,7 +17,21 @@ const routes = [
   {
     path: '/cart',
     name: 'Cart',
-    component: Cart, // Add the Cart route
+    component: Cart,
+    meta: { requiresAuth: true },
+  },
+  {
+    path: '/',
+    redirect: '/login', // Redirect root path to /login
+  },
+  {
+    path: '/:catchAll(.*)',
+    redirect: '/login', // Redirect any unmatched paths to /login
+  },
+  {
+    path: '/profile',
+    name: 'Profile',
+    component: Profile, // Add the Profile route
   }
 ];
 
