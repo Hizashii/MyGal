@@ -1,3 +1,4 @@
+
 <template>
   <div class="discover-page">
     <!-- Top Navigation -->
@@ -13,23 +14,33 @@
         </button>
       </div>
     </div>
-    
+
     <!-- Hero Image Section -->
-    <div class="hero-image">
+    <div class="hero-section">
+      <video class="hero-video" autoplay muted loop>
+        <source src="@/videos/Video.mp4" type="video/mp4">
+        Your browser does not support the video tag.
+      </video>
       <div class="hero-text">+60 000 PEOPLE CHOSE MYGAL</div>
     </div>
-    
+
     <!-- Main Content -->
     <div class="main-content">
-      <div class="title"><h1>Discover more art</h1></div>
-      
+      <div class="title">
+        <h1>Discover more art</h1>
+      </div>
+
       <!-- Carousels -->
       <div class="carousel-section" v-for="(carousel, index) in carousels" :key="index">
         <h2 class="carousel-title">{{ carousel.title }}</h2>
         <div class="carousel">
           <div class="carousel-item" v-for="item in carousel.items" :key="item.id">
-            <img :src="item.image" :alt="item.name" class="carousel-image">
-            <div class="artist-name">@{{ item.artist }}</div>
+            <div class="artist-name">{{ item.artist }}</div>
+            <img :src="item.image" :alt="item.artist" class="carousel-image">
+            <div class="item-details">
+              <div class="price">${{ item.price }}</div>
+              <button @click="addToCart(item)" class="add-button">Add</button>
+            </div>
           </div>
         </div>
       </div>
@@ -38,69 +49,101 @@
 </template>
 
 <script>
+import { ref } from 'vue';
+import { useRouter } from 'vue-router'; // Import useRouter
+
+import art1 from '@/images/more.jpg';
+import art2 from '@/images/treva.jpg';
+import art3 from '@/images/lodka.jpg';
+import art4 from '@/images/lodki.jpg';
+import art5 from '@/images/OceanWaves-SamuelEarp-OilPainting.jpg';
+import art6 from '@/images/blue.jpeg';
+import art7 from '@/images/blueblue.jpeg';
+import art8 from '@/images/pink.jpg';
+import art9 from '@/images/italia.jpg';
+
 export default {
-  data() {
-    return {
-      carousels: [
-        {
-          title: 'Featured Artworks',
-          items: [
-            { id: 1, image: 'https://source.unsplash.com/random/200x200?art', artist: 'ArtistName1' },
-            { id: 2, image: 'https://source.unsplash.com/random/200x200?art', artist: 'ArtistName2' },
-            { id: 3, image: 'https://source.unsplash.com/random/200x200?art', artist: 'ArtistName3' },
-          ],
-        },
-        {
-          title: 'New Arrivals',
-          items: [
-            { id: 4, image: 'https://source.unsplash.com/random/200x200?art', artist: 'ArtistName4' },
-            { id: 5, image: 'https://source.unsplash.com/random/200x200?art', artist: 'ArtistName5' },
-            { id: 6, image: 'https://source.unsplash.com/random/200x200?art', artist: 'ArtistName6' },
-          ],
-        },
-        {
-          title: 'Popular Artists',
-          items: [
-            { id: 7, image: 'https://source.unsplash.com/random/200x200?art', artist: 'ArtistName7' },
-            { id: 8, image: 'https://source.unsplash.com/random/200x200?art', artist: 'ArtistName8' },
-            { id: 9, image: 'https://source.unsplash.com/random/200x200?art', artist: 'ArtistName9' },
-          ],
-        },
-      ],
-    };
-  },
-  methods: {
-    navigate(page) {
+  setup() {
+    const router = useRouter(); // Get the router instance
+
+    const carousels = ref([
+      {
+        title: 'Featured Artworks',
+        items: [
+          { id: 1, image: art1, artist: 'ArtistName1', price: 50 },
+          { id: 2, image: art2, artist: 'ArtistName2', price: 75 },
+          { id: 3, image: art3, artist: 'ArtistName3', price: 100 },
+        ],
+      },
+      {
+        title: 'New Arrivals',
+        items: [
+          { id: 4, image: art4, artist: 'ArtistName4', price: 60 },
+          { id: 5, image: art5, artist: 'ArtistName5', price: 80 },
+          { id: 6, image: art6, artist: 'ArtistName6', price: 90 },
+        ],
+      },
+      {
+        title: 'Popular Artists',
+        items: [
+          { id: 7, image: art7, artist: 'ArtistName7', price: 70 },
+          { id: 8, image: art8, artist: 'ArtistName8', price: 85 },
+          { id: 9, image: art9, artist: 'ArtistName9', price: 95 },
+        ],
+      },
+    ]);
+
+    const navigate = (page) => {
       if (page === 'profile') {
-        this.$router.push('/profile');
+        router.push('/profile');
       } else if (page === 'discover') {
-        this.$router.push('/discover');
+        router.push('/discover');
       }
-    },
-    logOut() {
+    };
+
+    const logOut = () => {
       localStorage.removeItem('authToken');
-      this.$router.push('/login');
-    },
-    goToCart() {
-      this.$router.push('/cart'); // Navigate to the Cart page
-    },
+      router.push('/login');
+    };
+
+    const goToCart = () => {
+      router.push('/cart');
+    };
+
+    const addToCart = (item) => {
+      let cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+      const foundItem = cartItems.find(i => i.id === item.id);
+      if (foundItem) {
+        foundItem.quantity += 1;
+      } else {
+        cartItems.push({ ...item, quantity: 1 });
+      }
+      localStorage.setItem('cartItems', JSON.stringify(cartItems));
+      router.push('/cart');
+    };
+
+    return {
+      carousels,
+      navigate,
+      logOut,
+      goToCart,
+      addToCart,
+    };
   },
 };
 </script>
 
 <style scoped>
-/* Existing Styles */
-
 .cart-button {
   background: none;
   border: none;
   cursor: pointer;
   padding: 0;
-  margin-left: 10px; /* Adjust spacing as needed */
+  margin-left: 10px;
 }
 
 .cart-icon {
-  width: 24px; /* Size of the cart icon */
+  width: 24px;
   height: 24px;
 }
 
@@ -112,10 +155,10 @@ export default {
 .discover-page {
   display: flex;
   flex-direction: column;
-  min-height: 100vh; /* Ensure page takes at least full viewport height */
+  min-height: 100vh;
   width: 100vw;
   margin: 0;
-  overflow-y: auto; /* Allow vertical scrolling */
+  overflow-y: auto;
 }
 
 .top-nav {
@@ -133,27 +176,33 @@ export default {
   height: 35px;
 }
 
-.hero-image {
+.hero-section {
+  position: relative;
   width: 100%;
   height: 500px;
-  background-image: 
-    linear-gradient(
-      rgba(0, 0, 0, 0.7), 
-      rgba(0, 0, 0, 0.7)
-    ),
-    url('@/images/sims.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  overflow: hidden;
+}
+
+.hero-video {
+  opacity: 70%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
 }
 
 .hero-text {
+  position: absolute;
+  bottom: 230px;
+  left: 50%;
+  transform: translateX(-50%);
   color: white;
   font-size: 24px;
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  z-index: 1;
 }
 
 .main-content {
@@ -180,33 +229,60 @@ export default {
 
 .carousel {
   display: flex;
-  overflow-x: auto;
+  justify-content: center;
   gap: 10px;
+  overflow-x: auto;
+  padding: 10px 0;
 }
 
 .carousel-item {
-  min-width: 200px;
-  height: 200px;
-  background-color: #ddd;
+  width: 320px;
+  height: 320px;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: center;
+  justify-content: flex-start; /* Align items to the top */
   font-size: 18px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .carousel-image {
   width: 100%;
-  height: 150px;
+  height: 220px; /* Adjusted to fit the price under the image */
   object-fit: cover;
   border-radius: 10px;
 }
 
 .artist-name {
-  margin-top: 5px;
-  font-size: 14px;
+  margin-bottom: 5px;
+  font-size: 16px;
+  font-weight: bold;
   color: #333;
+}
+
+.item-details {
+  display: flex;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.price {
+  margin-right: 10px;
+  font-size: 16px;
+  font-weight: bold;
+  color: #555;
+}
+
+.add-button {
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.add-button:hover {
+  background-color: #0056b3;
 }
 </style>

@@ -14,7 +14,7 @@
     <div class="auth-container">
       <h1>{{ isRegistering ? 'Register' : 'Sign In' }}</h1>
       <form @submit.prevent="handleSubmit">
-        <input v-model="username" type="text" placeholder="Username" required />
+        <input v-model="email" type="email" placeholder="Email" required />
         <input v-model="password" type="password" placeholder="Password" required />
         <button type="submit">{{ isRegistering ? 'Register' : 'Log In' }}</button>
       </form>
@@ -24,14 +24,17 @@
     </div>
   </div>
 </template>
+<!-- 
+write requirements for password (at least 6 symbols) -->
 
 
 <script>
+import { auth, googleProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword } from '../firebaseConfig'; // Correct imports
 
 export default {
   data() {
     return {
-      username: '',
+      email: '',
       password: '',
       isRegistering: false,
     };
@@ -40,22 +43,28 @@ export default {
     toggleMode() {
       this.isRegistering = !this.isRegistering;
     },
-    handleSubmit() {
-      if (this.isRegistering) {
-        // Handle registration logic here (e.g., send a request to your API)
-        localStorage.setItem('authToken', 'dummyToken'); // Example token
-      } else {
-        // Handle login logic here (e.g., send a request to your API)
-        localStorage.setItem('authToken', 'dummyToken'); // Example token
+    async handleSubmit() {
+      try {
+        if (this.isRegistering) {
+          // Register a new user
+          await createUserWithEmailAndPassword(auth, this.email, this.password);
+          console.log('User registered successfully');
+        } else {
+          // Sign in an existing user
+          await signInWithEmailAndPassword(auth, this.email, this.password);
+          console.log('User signed in successfully');
+        }
+        
+        // Redirect to Discover.vue
+        this.$router.push('/discover'); // Use path not filename
+      } catch (error) {
+        console.error('Authentication Error:', error.message);
+        // Handle authentication errors, e.g., display error messages
       }
-
-      // Redirect to Discover.vue
-      this.$router.push('/discover'); // Use path not filename
     },
   },
 };
 </script>
-
 
 
 <style scoped>
