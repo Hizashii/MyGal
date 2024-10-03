@@ -17,10 +17,10 @@
     <!-- Profile Header -->
     <div class="profile-header">
       <div class="avatar">
-        <img src="https://source.unsplash.com/random/150x150?portrait" alt="User Avatar">
+        <img src="@/images/artist2.jpg" alt="User Avatar">
       </div>
       <div class="user-info">
-        <h1>@username</h1>
+        <h1>@kallythedreamer</h1>
         <p>Artist | Creator | Dreamer</p>
         <div class="follow-info">
           <span><strong>120</strong> Following</span>
@@ -63,7 +63,6 @@ export default {
 </script>
 
 <style scoped>
-/* Dark Mode Styling */
 .profile-page {
   display: flex;
   flex-direction: column;
@@ -72,7 +71,6 @@ export default {
   color: #e0e0e0;
 }
 
-/* Navigation Styles */
 .top-nav {
   display: flex;
   align-items: center;
@@ -94,13 +92,14 @@ export default {
   font-size: 16px;
   margin-left: 15px;
   cursor: pointer;
-  color: #e0e0e0;
+  color: #f5f2f2;
   transition: color 0.3s ease;
 }
 
 .nav-buttons button:hover {
-  color: #ff5722;
+  color: #A982AA;
 }
+
 
 .cart-button {
   background: none;

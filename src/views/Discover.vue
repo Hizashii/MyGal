@@ -44,6 +44,13 @@
           </div>
         </div>
       </div>
+
+
+       <!-- Discover More Button -->
+       <div class="discover-more-container">
+        <button @click="discoverMore" class="discover-more-button">Discover More</button>
+      </div>
+
     </div>
   </div>
 </template>
@@ -68,27 +75,24 @@ export default {
 
     const carousels = ref([
       {
-        title: 'Featured Artworks',
         items: [
-          { id: 1, image: art1, artist: 'ArtistName1', price: 50 },
-          { id: 2, image: art2, artist: 'ArtistName2', price: 75 },
-          { id: 3, image: art3, artist: 'ArtistName3', price: 100 },
+          { id: 1, image: art1, artist: '@kateandersen', price: 50 },
+          { id: 2, image: art2, artist: '@miketheartist', price: 75 },
+          { id: 3, image: art3, artist: '@nigelspictures', price: 100 },
         ],
       },
       {
-        title: 'New Arrivals',
         items: [
-          { id: 4, image: art4, artist: 'ArtistName4', price: 60 },
-          { id: 5, image: art5, artist: 'ArtistName5', price: 80 },
-          { id: 6, image: art6, artist: 'ArtistName6', price: 90 },
+          { id: 4, image: art4, artist: '@callmeart', price: 60 },
+          { id: 5, image: art5, artist: '@sealover', price: 80 },
+          { id: 6, image: art6, artist: '@bluesoul', price: 90 },
         ],
       },
       {
-        title: 'Popular Artists',
         items: [
-          { id: 7, image: art7, artist: 'ArtistName7', price: 70 },
-          { id: 8, image: art8, artist: 'ArtistName8', price: 85 },
-          { id: 9, image: art9, artist: 'ArtistName9', price: 95 },
+          { id: 7, image: art7, artist: '@mariaclarck', price: 70 },
+          { id: 8, image: art8, artist: '@hotartonboard', price: 85 },
+          { id: 9, image: art9, artist: '@mynameismark', price: 95 },
         ],
       },
     ]);
@@ -122,6 +126,8 @@ export default {
       router.push('/cart');
     };
 
+  
+
     return {
       carousels,
       navigate,
@@ -134,6 +140,43 @@ export default {
 </script>
 
 <style scoped>
+
+.discover-more-container {
+  display: flex;
+  justify-content: center;
+ 
+}
+
+.discover-more-button {
+  background-color: #55434f;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-size: 19px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.discover-more-button:hover {
+  background-color: #271b28;
+  transform: scale(1.05);
+}
+
+.nav-buttons button {
+  background: none;
+  border: none;
+  font-size: 16px;
+  margin-left: 15px;
+  cursor: pointer;
+  color: #0e0d0d;
+  transition: color 0.3s ease;
+}
+
+.nav-buttons button:hover {
+  color: #A982AA;
+}
+
 .cart-button {
   background: none;
   border: none;
@@ -274,15 +317,17 @@ export default {
 }
 
 .add-button {
-  background-color: #007bff;
+  background-color: #A982AA;
   color: white;
   border: none;
   border-radius: 4px;
   padding: 5px 10px;
   cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .add-button:hover {
-  background-color: #0056b3;
+  background-color: #5e495f;
+  transform: scale(1.05);
 }
 </style>

@@ -24,9 +24,7 @@
     </div>
   </div>
 </template>
-<!-- 
-write requirements for password (at least 6 symbols) -->
-
+<!-- write requirements for password (at least 6 symbols) -->
 
 <script>
 import { auth, googleProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword } from '../firebaseConfig'; // Correct imports
@@ -54,7 +52,6 @@ export default {
           await signInWithEmailAndPassword(auth, this.email, this.password);
           console.log('User signed in successfully');
         }
-        
         // Redirect to Discover.vue
         this.$router.push('/discover'); // Use path not filename
       } catch (error) {
@@ -71,23 +68,23 @@ export default {
 
 .intro-text {
   position: absolute;
-  top: 19.3%; /* Adjust to place under the logo */
-  right: 66%;  
+  top: 15%; 
+  right: 71.5%;  
   padding: 20px;
 }
 
 .Digi {
-  text-align: left; /* Align text to the left */
+  text-align: left; 
   margin: 0;
   color: white;
   font-size: 16px;
 }
 .logo {
   position: absolute;
-  top: 40px; /* Position the logo 20px from the top */
-  left: 65px; /* Position the logo 20px from the left */
-  width: 250px; /* Width of the logo */
-  height: 105px; /* Height of the logo */
+  top: 40px; 
+  left: 65px; 
+  width: 250px; 
+  height: 105px; 
 }
 .auth-page {
   position: absolute;
@@ -99,16 +96,15 @@ export default {
   justify-content: center;
   align-items: center;
   background: 
-    /* Gradient overlay with transparency */
     linear-gradient(
       rgba(0, 0, 0, 0.5), 
       rgba(0, 0, 0, 0.5)
     ),
-    url('@/images/Background_Login.jpg'); /* Your image path */
+    url('@/images/Background_Login.jpg'); 
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  margin: 0; /* Ensure there’s no margin */
+  margin: 0; 
 }
 
 .auth-container {
@@ -116,7 +112,7 @@ export default {
   padding: 4.2rem;
   border-radius: 35px;
   box-shadow: 0 6px 9px rgba(0, 0, 0, 0.3);
-  overflow: hidden; /* Prevents overflow of content */
+  overflow: hidden; 
 
 }
 
@@ -134,24 +130,24 @@ form {
 
 input {
   margin-bottom: 1rem;
-  padding: 0.75rem; /* Increase padding to make the input box larger */
+  padding: 0.75rem; 
   border: 1px solid #ddd;
   border-radius: 10px;
   background-color: white;
-  font-size: 16px; /* Increase font size for better visibility */
-  box-sizing: border-box; /* Include padding and border in total width and height */
+  font-size: 16px; 
+  box-sizing: border-box;
 }
 
 button {
-  padding: 0.75rem; /* Increase padding to make the button larger */
+  padding: 0.75rem; 
   border: none;
   background-color: #A982AA;
   color: white;
   border-radius: 12px;
   cursor: pointer;
-  margin-top: 10px; /* Increase margin for spacing */
-  font-size: 16px; /* Increase font size for better visibility */
-  box-sizing: border-box; /* Include padding and border in total width and height */
+  margin-top: 10px; 
+  font-size: 16px; 
+  box-sizing: border-box; 
 }
 
 button:last-of-type {
