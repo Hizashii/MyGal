@@ -1,4 +1,4 @@
-<template>
+<!-- <template>
     <div class="art-piece">
       <h3>{{ item.name }}</h3>
       <p>Price: ${{ item.price }}</p>
@@ -26,4 +26,4 @@
     margin-bottom: 10px;
   }
   </style>
-  
+   -->

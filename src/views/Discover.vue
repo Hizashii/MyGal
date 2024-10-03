@@ -1,4 +1,3 @@
-
 <template>
   <div class="discover-page">
     <!-- Top Navigation -->
@@ -45,19 +44,18 @@
         </div>
       </div>
 
-
-       <!-- Discover More Button -->
-       <div class="discover-more-container">
+      <!-- Discover More Button -->
+      <div class="discover-more-container">
         <button @click="discoverMore" class="discover-more-button">Discover More</button>
       </div>
-
     </div>
   </div>
 </template>
 
 <script>
 import { ref } from 'vue';
-import { useRouter } from 'vue-router'; // Import useRouter
+import { useRouter } from 'vue-router';
+import { auth, signOut } from '../firebaseConfig'; // Import Firebase authentication and signOut
 
 import art1 from '@/images/more.jpg';
 import art2 from '@/images/treva.jpg';
@@ -105,9 +103,13 @@ export default {
       }
     };
 
-    const logOut = () => {
-      localStorage.removeItem('authToken');
-      router.push('/login');
+    const logOut = async () => {
+      try {
+        await signOut(auth); // Use Firebase's signOut method to log out
+        router.push('/login');
+      } catch (error) {
+        console.error('Error during sign out:', error.message);
+      }
     };
 
     const goToCart = () => {
@@ -125,8 +127,6 @@ export default {
       localStorage.setItem('cartItems', JSON.stringify(cartItems));
       router.push('/cart');
     };
-
-  
 
     return {
       carousels,

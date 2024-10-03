@@ -7,7 +7,6 @@
         <button @click="navigate('discover')">Discover</button>
         <button @click="navigate('profile')">My Profile</button>
         <button @click="logOut">Log Out</button>
-        <!-- Cart Button -->
         <button @click="goToCart" class="cart-button">
           <img src="@/images/cart.png" alt="Cart Icon" class="cart-icon">
         </button>
@@ -17,10 +16,11 @@
     <!-- Profile Header -->
     <div class="profile-header">
       <div class="avatar">
-        <img src="@/images/artist2.jpg" alt="User Avatar">
+        <img :src="profilePhotoUrl" alt="User Avatar" v-if="profilePhotoUrl" />
+        <input type="file" accept="image/*" @change="uploadProfilePhoto" v-else />
       </div>
       <div class="user-info">
-        <h1>@kallythedreamer</h1>
+        <h1>{{ user?.email || 'Guest' }}</h1>
         <p>Artist | Creator | Dreamer</p>
         <div class="follow-info">
           <span><strong>120</strong> Following</span>
@@ -32,9 +32,10 @@
     <!-- Gallery Section -->
     <div class="gallery-section">
       <h2>Your Gallery</h2>
+      <input type="file" accept="image/*" multiple @change="uploadGalleryPhotos" />
       <div class="gallery">
-        <div class="gallery-item" v-for="index in 8" :key="index">
-          <img :src="'https://source.unsplash.com/random/200x200?art&' + index" alt="Artwork">+
+        <div class="gallery-item" v-for="(photo, index) in galleryPhotos" :key="index">
+          <img :src="photo" alt="Artwork" />
         </div>
       </div>
     </div>
@@ -42,23 +43,117 @@
 </template>
 
 <script>
+import { auth, signOut } from '../firebaseConfig';
+import { ref, onMounted } from 'vue';
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { useRouter } from 'vue-router';
+import { onAuthStateChanged } from 'firebase/auth';
+import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore'; // Import Firestore methods
+
 export default {
-  methods: {
-    navigate(page) {
-      if (page === 'profile') {
-        this.$router.push('/profile');
-      } else if (page === 'discover') {
-        this.$router.push('/discover');
+  setup() {
+    const router = useRouter();
+    const user = ref(null);
+    const profilePhotoUrl = ref('');
+    const galleryPhotos = ref([]);
+
+    const db = getFirestore(); // Initialize Firestore
+
+    // Listen to authentication state changes
+    onAuthStateChanged(auth, async (currentUser) => {
+      if (currentUser) {
+        user.value = currentUser;
+        await fetchUserProfile(currentUser.uid); // Fetch user profile on login
+      } else {
+        router.push('/login');
       }
-    },
-    logOut() {
-      localStorage.removeItem('authToken');
-      this.$router.push('/login');
-    },
-    goToCart() {
-      this.$router.push('/cart');
-    }
-  }
+    });
+
+    const fetchUserProfile = async (uid) => {
+      const docRef = doc(db, 'users', uid); // Path to user document in Firestore
+      const docSnap = await getDoc(docRef);
+
+      if (docSnap.exists()) {
+        const data = docSnap.data();
+        profilePhotoUrl.value = data.profilePhotoUrl || ''; // Load profile photo URL
+        galleryPhotos.value = data.galleryPhotos || []; // Load gallery photo URLs
+      } else {
+        console.log('No such document!');
+      }
+    };
+
+    const navigate = (page) => {
+      if (page === 'profile') {
+        router.push('/profile');
+      } else if (page === 'discover') {
+        router.push('/discover');
+      }
+    };
+
+    const logOut = async () => {
+      try {
+        await signOut(auth);
+        router.push('/login');
+      } catch (error) {
+        console.error('Error during sign out:', error.message);
+      }
+    };
+
+    const goToCart = () => {
+      router.push('/cart');
+    };
+
+    const uploadProfilePhoto = async (event) => {
+      const file = event.target.files[0];
+      if (!file || !user.value) return;
+
+      const storage = getStorage();
+      const storageReference = storageRef(storage, `profile_photos/${user.value.uid}/${file.name}`);
+
+      try {
+        await uploadBytes(storageReference, file);
+        const url = await getDownloadURL(storageReference);
+        profilePhotoUrl.value = url; // Update profile photo URL
+        await saveUserProfile(user.value.uid, { profilePhotoUrl: url }); // Save URL to Firestore
+      } catch (error) {
+        console.error('Error uploading profile photo:', error.message);
+      }
+    };
+
+    const uploadGalleryPhotos = async (event) => {
+      const files = event.target.files;
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        const storage = getStorage();
+        const storageReference = storageRef(storage, `gallery_photos/${user.value.uid}/${file.name}`);
+
+        try {
+          await uploadBytes(storageReference, file);
+          const url = await getDownloadURL(storageReference);
+          galleryPhotos.value.push(url); // Add URL to gallery photos
+          await saveUserProfile(user.value.uid, { galleryPhotos: galleryPhotos.value }); // Save URLs to Firestore
+        } catch (error) {
+          console.error('Error uploading gallery photo:', error.message);
+        }
+      }
+    };
+
+    const saveUserProfile = async (uid, data) => {
+      const docRef = doc(db, 'users', uid);
+      await setDoc(docRef, data, { merge: true }); // Use merge to update specific fields
+    };
+
+    return {
+      user,
+      profilePhotoUrl,
+      galleryPhotos,
+      navigate,
+      logOut,
+      goToCart,
+      uploadProfilePhoto,
+      uploadGalleryPhotos,
+    };
+  },
 };
 </script>
 

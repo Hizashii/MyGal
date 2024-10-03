@@ -1,15 +1,15 @@
 <template>
-<div class="top-nav">
-      <img src="@/images/mygal-logo-black.png" alt="MyGal Logo" class="logo">
-      <div class="nav-buttons">
-        <button @click="navigate('discover')">Discover</button>
-        <button @click="navigate('profile')">My Profile</button>
-        <button @click="logOut">Log Out</button>
-        <button @click="goToCart" class="cart-button">
-          <img src="@/images/cart.png" alt="Cart Icon" class="cart-icon">
-        </button>
-      </div>
+  <div class="top-nav">
+    <img src="@/images/mygal-logo-black.png" alt="MyGal Logo" class="logo">
+    <div class="nav-buttons">
+      <button @click="navigate('discover')">Discover</button>
+      <button @click="navigate('profile')">My Profile</button>
+      <button @click="logOut">Log Out</button>
+      <button @click="goToCart" class="cart-button">
+        <img src="@/images/cart.png" alt="Cart Icon" class="cart-icon">
+      </button>
     </div>
+  </div>
 
   <div class="cart-page">
     <h1>Your Shopping Cart</h1>
@@ -39,6 +39,8 @@
 
 <script>
 import PaymentMethods from '@/components/PaymentMethods.vue';
+import { useRouter } from 'vue-router';
+import { auth, signOut } from '../firebaseConfig'; // Import Firebase authentication and signOut
 
 export default {
   components: {
@@ -68,6 +70,24 @@ export default {
     },
     saveCart() {
       localStorage.setItem('cartItems', JSON.stringify(this.selectedItems));
+    },
+    goToCart() {
+      this.$router.push('/cart');
+    },
+    navigate(page) {
+      if (page === 'profile') {
+        this.$router.push('/profile');
+      } else if (page === 'discover') {
+        this.$router.push('/discover');
+      }
+    },
+    async logOut() {
+      try {
+        await signOut(auth); // Use Firebase's signOut method to log out
+        this.$router.push('/login');
+      } catch (error) {
+        console.error('Error during sign out:', error.message);
+      }
     }
   },
   created() {

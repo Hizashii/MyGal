@@ -1,6 +1,5 @@
 <template>
   <div class="auth-page">
-    <!-- Logo -->
     <img src="@/images/mygal-logo-whitish.png" alt="MyGal Logo" class="logo">
     <div class="intro-text">
       <p class="Digi">
@@ -10,12 +9,11 @@
       </p>
     </div>
     
-    <!-- Sign-in/Register Container -->
     <div class="auth-container">
       <h1>{{ isRegistering ? 'Register' : 'Sign In' }}</h1>
       <form @submit.prevent="handleSubmit">
         <input v-model="email" type="email" placeholder="Email" required />
-        <input v-model="password" type="password" placeholder="Password" required />
+        <input v-model="password" type="password" placeholder="Password (at least 6 characters)" required minlength="6" />
         <button type="submit">{{ isRegistering ? 'Register' : 'Log In' }}</button>
       </form>
       <button @click="toggleMode">
@@ -24,48 +22,53 @@
     </div>
   </div>
 </template>
-<!-- write requirements for password (at least 6 symbols) -->
 
 <script>
-import { auth, googleProvider, createUserWithEmailAndPassword, signInWithEmailAndPassword } from '../firebaseConfig'; // Correct imports
+import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from '../firebaseConfig';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router'; // Import useRouter
 
 export default {
-  data() {
-    return {
-      email: '',
-      password: '',
-      isRegistering: false,
+  setup() {
+    const email = ref('');
+    const password = ref('');
+    const isRegistering = ref(false);
+    const router = useRouter(); // Get router instance
+
+    const toggleMode = () => {
+      isRegistering.value = !isRegistering.value;
     };
-  },
-  methods: {
-    toggleMode() {
-      this.isRegistering = !this.isRegistering;
-    },
-    async handleSubmit() {
+
+    const handleSubmit = async () => {
       try {
-        if (this.isRegistering) {
-          // Register a new user
-          await createUserWithEmailAndPassword(auth, this.email, this.password);
-          console.log('User registered successfully');
+        if (isRegistering.value) {
+          await createUserWithEmailAndPassword(auth, email.value, password.value);
+          alert('Registration successful!');
         } else {
-          // Sign in an existing user
-          await signInWithEmailAndPassword(auth, this.email, this.password);
-          console.log('User signed in successfully');
+          await signInWithEmailAndPassword(auth, email.value, password.value);
+          alert('Login successful!');
+
+          // Redirect to Discover page after successful login
+          router.push({ name: 'Discover' }); // Make sure 'Discover' route is defined in your router
         }
-        // Redirect to Discover.vue
-        this.$router.push('/discover'); // Use path not filename
       } catch (error) {
-        console.error('Authentication Error:', error.message);
-        // Handle authentication errors, e.g., display error messages
+        console.error('Error during authentication:', error);
+        alert('Error: ' + error.message);
       }
-    },
+    };
+
+    return {
+      email,
+      password,
+      isRegistering,
+      toggleMode,
+      handleSubmit,
+    };
   },
 };
 </script>
 
-
 <style scoped>
-
 .intro-text {
   position: absolute;
   top: 15%; 
@@ -79,6 +82,7 @@ export default {
   color: white;
   font-size: 16px;
 }
+
 .logo {
   position: absolute;
   top: 40px; 
@@ -86,6 +90,7 @@ export default {
   width: 250px; 
   height: 105px; 
 }
+
 .auth-page {
   position: absolute;
   top: 0;
@@ -113,7 +118,6 @@ export default {
   border-radius: 35px;
   box-shadow: 0 6px 9px rgba(0, 0, 0, 0.3);
   overflow: hidden; 
-
 }
 
 .auth-container h1 {
