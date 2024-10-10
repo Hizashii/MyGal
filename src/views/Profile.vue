@@ -1,17 +1,7 @@
 <template>
   <div class="profile-page">
     <!-- Top Navigation -->
-    <div class="top-nav">
-      <img src="@/images/mygal-logo-whitish.png" alt="MyGal Logo" class="logo">
-      <div class="nav-buttons">
-        <button @click="navigate('discover')">Discover</button>
-        <button @click="navigate('profile')">My Profile</button>
-        <button @click="logOut">Log Out</button>
-        <button @click="goToCart" class="cart-button">
-          <img src="@/images/cart.png" alt="Cart Icon" class="cart-icon">
-        </button>
-      </div>
-    </div>
+    <TopNav />
 
     <!-- Profile Header -->
     <div class="profile-header">
@@ -58,8 +48,12 @@ import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from 'fire
 import { useRouter } from 'vue-router';
 import { onAuthStateChanged } from 'firebase/auth';
 import { getFirestore, doc, setDoc, getDoc, collection, addDoc } from 'firebase/firestore'; // Firestore methods
+import TopNav from '@/components/TopNav.vue'; // Import TopNav component
 
 export default {
+  components: {
+    TopNav, // Register TopNav component
+  },
   setup() {
     const router = useRouter();
     const user = ref(null);
@@ -88,14 +82,6 @@ export default {
         galleryPhotos.value = data.galleryPhotos || []; // Load gallery photo URLs
       } else {
         console.log('No such document!');
-      }
-    };
-
-    const navigate = (page) => {
-      if (page === 'profile') {
-        router.push('/profile');
-      } else if (page === 'discover') {
-        router.push('/discover');
       }
     };
 
@@ -182,7 +168,6 @@ export default {
       profilePhotoUrl,
       galleryPhotos,
       pendingPhotos,
-      navigate,
       logOut,
       goToCart,
       uploadProfilePhoto,
@@ -203,47 +188,6 @@ export default {
   color: #e0e0e0;
 }
 
-.top-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 20px;
-  background-color: #1f1f1f;
-  border-bottom: 1px solid #333;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-}
-
-.logo {
-  width: 80px;
-  height: 35px;
-}
-
-.nav-buttons button {
-  background: none;
-  border: none;
-  font-size: 16px;
-  margin-left: 15px;
-  cursor: pointer;
-  color: #f5f2f2;
-  transition: color 0.3s ease;
-}
-
-.nav-buttons button:hover {
-  color: #A982AA;
-}
-
-.cart-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  margin-left: 10px;
-}
-
-.cart-icon {
-  width: 24px;
-  height: 24px;
-}
 
 /* Profile Header Styles */
 .profile-header {

@@ -1,19 +1,9 @@
 <template>
-  <div class="top-nav">
-    <img src="@/images/mygal-logo-black.png" alt="MyGal Logo" class="logo">
-    <div class="nav-buttons">
-      <button @click="navigate('discover')">Discover</button>
-      <button @click="navigate('profile')">My Profile</button>
-      <button @click="logOut">Log Out</button>
-      <button @click="goToCart" class="cart-button">
-        <img src="@/images/cart.png" alt="Cart Icon" class="cart-icon">
-      </button>
-    </div>
-  </div>
+  <TopNav :logoSrc="logoSrc" />
 
   <div class="cart-page">
     <h1>Your Shopping Cart</h1>
-    
+
     <!-- Selected Items Section -->
     <div class="selected-items">
       <h2>Selected Items</h2>
@@ -31,127 +21,87 @@
       </ul>
       <p>Total: ${{ total }}</p>
     </div>
-    
-    <!-- Payment Methods -->
+
     <PaymentMethods />
   </div>
 </template>
 
 <script>
-import PaymentMethods from '@/components/PaymentMethods.vue';
+import { ref, computed, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { auth, signOut } from '../firebaseConfig'; // Import Firebase authentication and signOut
+import { auth, signOut } from '../firebaseConfig'; 
+import TopNav from '@/components/TopNav.vue';
+import PaymentMethods from '@/components/PaymentMethods.vue';
 
 export default {
   components: {
+    TopNav,
     PaymentMethods,
   },
-  data() {
-    return {
-      selectedItems: JSON.parse(localStorage.getItem('cartItems')) || [],
-    };
-  },
-  computed: {
-    total() {
-      return this.selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    }
-  },
-  methods: {
-    updateQuantity(item) {
-      const index = this.selectedItems.findIndex(i => i.id === item.id);
+  setup() {
+    const selectedItems = ref(JSON.parse(localStorage.getItem('cartItems')) || []);
+    const router = useRouter();
+
+    const total = computed(() => {
+      return selectedItems.value.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+    });
+
+    const updateQuantity = (item) => {
+      const index = selectedItems.value.findIndex(i => i.id === item.id);
       if (index !== -1) {
-        this.selectedItems[index].quantity = item.quantity;
-        this.saveCart();
+        selectedItems.value[index].quantity = item.quantity;
+        saveCart();
       }
-    },
-    removeItem(id) {
-      this.selectedItems = this.selectedItems.filter(item => item.id !== id);
-      this.saveCart();
-    },
-    saveCart() {
-      localStorage.setItem('cartItems', JSON.stringify(this.selectedItems));
-    },
-    goToCart() {
-      this.$router.push('/cart');
-    },
-    navigate(page) {
+    };
+
+    const removeItem = (id) => {
+      selectedItems.value = selectedItems.value.filter(item => item.id !== id);
+      saveCart();
+    };
+
+    const saveCart = () => {
+      localStorage.setItem('cartItems', JSON.stringify(selectedItems.value));
+    };
+
+    const goToCart = () => {
+      router.push('/cart');
+    };
+
+    const navigate = (page) => {
       if (page === 'profile') {
-        this.$router.push('/profile');
+        router.push('/profile');
       } else if (page === 'discover') {
-        this.$router.push('/discover');
+        router.push('/discover');
       }
-    },
-    async logOut() {
+    };
+
+    const logOut = async () => {
       try {
-        await signOut(auth); // Use Firebase's signOut method to log out
-        this.$router.push('/login');
+        await signOut(auth); // Firebase sign out
+        router.push('/login');
       } catch (error) {
         console.error('Error during sign out:', error.message);
       }
-    }
+    };
+
+    onMounted(() => {
+      selectedItems.value = JSON.parse(localStorage.getItem('cartItems')) || [];
+    });
+
+    return {
+      selectedItems,
+      total,
+      updateQuantity,
+      removeItem,
+      goToCart,
+      navigate,
+      logOut
+    };
   },
-  created() {
-    this.selectedItems = JSON.parse(localStorage.getItem('cartItems')) || [];
-  }
 };
 </script>
 
 <style scoped>
-.nav-buttons button {
-  background: none;
-  border: none;
-  font-size: 16px;
-  margin-left: 15px;
-  cursor: pointer;
-  color: #0e0d0d;
-  transition: color 0.3s ease;
-}
-
-.nav-buttons button:hover {
-  color: #A982AA;
-}
-
-.cart-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  margin-left: 10px;
-}
-
-.cart-icon {
-  width: 24px;
-  height: 24px;
-}
-
-.title h1 {
-  color: black;
-  font-weight: 450;
-}
-
-.discover-page {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  width: 100vw;
-  margin: 0;
-  overflow-y: auto;
-}
-
-.top-nav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 10px 20px;
-  background-color: #fff;
-  border-bottom: 1px solid #ddd;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.logo {
-  width: 80px;
-  height: 35px;
-}
 
 .cart-page {
   padding: 20px;

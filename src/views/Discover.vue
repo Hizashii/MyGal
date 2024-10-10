@@ -1,18 +1,7 @@
 <template>
   <div class="discover-page">
     <!-- Top Navigation -->
-    <div class="top-nav">
-      <img src="@/images/mygal-logo-black.png" alt="MyGal Logo" class="logo">
-      <div class="nav-buttons">
-        <button @click="navigate('discover')">Discover</button>
-        <button @click="navigate('profile')">My Profile</button>
-        <button @click="logOut">Log Out</button>
-        <!-- Cart Button -->
-        <button @click="goToCart" class="cart-button">
-          <img src="@/images/cart.png" alt="Cart Icon" class="cart-icon">
-        </button>
-      </div>
-    </div>
+    <TopNav @navigate="navigate" @logOut="logOut" @goToCart="goToCart" />
 
     <!-- Hero Image Section -->
     <div class="hero-section">
@@ -55,10 +44,6 @@
         </div>
       </div>
 
-      <!-- Discover More Button -->
-      <div class="discover-more-container">
-        <button @click="discoverMore" class="discover-more-button">Discover More</button>
-      </div>
 
       <!-- Loading and Error Handling -->
       <div v-if="loading" class="loading">Loading artworks...</div>
@@ -72,6 +57,7 @@ import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { auth, signOut } from '../firebaseConfig'; // Import Firebase authentication and signOut
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import TopNav from '@/components/TopNav.vue'; // Import TopNav component
 
 import art1 from '@/images/more.jpg';
 import art2 from '@/images/treva.jpg';
@@ -84,12 +70,14 @@ import art8 from '@/images/pink.jpg';
 import art9 from '@/images/italia.jpg';
 
 export default {
+  components: {
+    TopNav, 
+  },
   setup() {
-    const router = useRouter(); // Get the router instance
+    const router = useRouter(); 
 
     const carousels = ref([
       {
-        title: 'Featured Artworks', // Added titles to each carousel
         items: [
           { id: 1, image: art1, artist: '@kateandersen', price: 50 },
           { id: 2, image: art2, artist: '@miketheartist', price: 75 },
@@ -97,7 +85,6 @@ export default {
         ],
       },
       {
-        title: 'Trending Artworks', // Added titles to each carousel
         items: [
           { id: 4, image: art4, artist: '@callmeart', price: 60 },
           { id: 5, image: art5, artist: '@sealover', price: 80 },
@@ -105,7 +92,6 @@ export default {
         ],
       },
       {
-        title: 'New Arrivals', // Added titles to each carousel
         items: [
           { id: 7, image: art7, artist: '@mariaclarck', price: 70 },
           { id: 8, image: art8, artist: '@hotartonboard', price: 85 },
@@ -215,53 +201,7 @@ export default {
 
 <style scoped>
 
-.discover-more-container {
-  display: flex;
-  justify-content: center;
-}
 
-.discover-more-button {
-  background-color: #55434f;
-  color: white;
-  border: none;
-  border-radius: 25px;
-  padding: 10px 20px;
-  cursor: pointer;
-  font-size: 19px;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-}
-
-.discover-more-button:hover {
-  background-color: #271b28;
-  transform: scale(1.05);
-}
-
-.nav-buttons button {
-  background: none;
-  border: none;
-  font-size: 16px;
-  margin-left: 15px;
-  cursor: pointer;
-  color: #0e0d0d;
-  transition: color 0.3s ease;
-}
-
-.nav-buttons button:hover {
-  color: #A982AA;
-}
-
-.cart-button {
-  background: none;
-  border: none;
-  cursor: pointer;
-  padding: 0;
-  margin-left: 10px;
-}
-
-.cart-icon {
-  width: 24px;
-  height: 24px;
-}
 
 .title h1 {
   color: black;
