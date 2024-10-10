@@ -2,11 +2,6 @@
   <div class="auth-page">
     <img src="@/images/mygal-logo-whitish.png" alt="MyGal Logo" class="logo">
     <div class="intro-text">
-      <p class="Digi">
-        Create your own digital art gallery and reveal your talent<br>
-        to the world. Join or create an art community and help<br>
-        others grow. Welcome to MyGal's family!
-      </p>
     </div>
     
     <div class="auth-container">

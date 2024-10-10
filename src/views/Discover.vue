@@ -29,6 +29,17 @@
         <h1>Discover more art</h1>
       </div>
 
+      <!-- Sorting Dropdown -->
+      <div class="sorting-section">
+        <label for="sort-by">Sort By: </label>
+        <select id="sort-by" v-model="selectedSort" @change="sortItems">
+          <option value="priceAsc">Price: Low to High</option>
+          <option value="priceDesc">Price: High to Low</option>
+          <option value="nameAsc">Artist Name: A-Z</option>
+          <option value="nameDesc">Artist Name: Z-A</option>
+        </select>
+      </div>
+
       <!-- Carousels -->
       <div class="carousel-section" v-for="(carousel, index) in carousels" :key="index">
         <h2 class="carousel-title">{{ carousel.title }}</h2>
@@ -48,14 +59,19 @@
       <div class="discover-more-container">
         <button @click="discoverMore" class="discover-more-button">Discover More</button>
       </div>
+
+      <!-- Loading and Error Handling -->
+      <div v-if="loading" class="loading">Loading artworks...</div>
+      <div v-if="error" class="error">{{ error }}</div>
     </div>
   </div>
 </template>
 
 <script>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { auth, signOut } from '../firebaseConfig'; // Import Firebase authentication and signOut
+import { getFirestore, collection, getDocs } from 'firebase/firestore';
 
 import art1 from '@/images/more.jpg';
 import art2 from '@/images/treva.jpg';
@@ -73,6 +89,7 @@ export default {
 
     const carousels = ref([
       {
+        title: 'Featured Artworks', // Added titles to each carousel
         items: [
           { id: 1, image: art1, artist: '@kateandersen', price: 50 },
           { id: 2, image: art2, artist: '@miketheartist', price: 75 },
@@ -80,6 +97,7 @@ export default {
         ],
       },
       {
+        title: 'Trending Artworks', // Added titles to each carousel
         items: [
           { id: 4, image: art4, artist: '@callmeart', price: 60 },
           { id: 5, image: art5, artist: '@sealover', price: 80 },
@@ -87,6 +105,7 @@ export default {
         ],
       },
       {
+        title: 'New Arrivals', // Added titles to each carousel
         items: [
           { id: 7, image: art7, artist: '@mariaclarck', price: 70 },
           { id: 8, image: art8, artist: '@hotartonboard', price: 85 },
@@ -94,6 +113,57 @@ export default {
         ],
       },
     ]);
+
+    const selectedSort = ref('priceAsc'); // Default sorting option
+    const loading = ref(true); // Loading state
+    const error = ref(null); // Error state
+    const db = getFirestore(); // Initialize Firestore
+
+    // Fetching artworks from Firestore
+    const fetchDiscoverItems = async () => {
+      const discoverCollection = collection(db, 'discoverItems'); // Reference to discoverItems collection
+      try {
+        const snapshot = await getDocs(discoverCollection);
+        snapshot.forEach(doc => {
+          const data = doc.data();
+          carousels.value[0].items.push({
+            id: doc.id,
+            image: data.image,
+            artist: data.artist,
+            price: data.price,
+          });
+        });
+      } catch (err) {
+        console.error('Error fetching discover items:', err.message);
+        error.value = 'Failed to load artworks.';
+      } finally {
+        loading.value = false;
+      }
+    };
+
+    onMounted(() => {
+      fetchDiscoverItems(); // Fetch artworks on component mount
+    });
+
+    // Sorting logic
+    const sortItems = () => {
+      carousels.value.forEach(carousel => {
+        carousel.items.sort((a, b) => {
+          switch (selectedSort.value) {
+            case 'priceAsc':
+              return a.price - b.price; // Sort by price ascending
+            case 'priceDesc':
+              return b.price - a.price; // Sort by price descending
+            case 'nameAsc':
+              return a.artist.localeCompare(b.artist); // Sort by name A-Z
+            case 'nameDesc':
+              return b.artist.localeCompare(a.artist); // Sort by name Z-A
+            default:
+              return 0;
+          }
+        });
+      });
+    };
 
     const navigate = (page) => {
       if (page === 'profile') {
@@ -130,10 +200,14 @@ export default {
 
     return {
       carousels,
+      selectedSort,
+      sortItems,
       navigate,
       logOut,
       goToCart,
       addToCart,
+      loading,
+      error,
     };
   },
 };
@@ -144,7 +218,6 @@ export default {
 .discover-more-container {
   display: flex;
   justify-content: center;
- 
 }
 
 .discover-more-button {
@@ -248,86 +321,102 @@ export default {
   z-index: 1;
 }
 
+/* Set main-content background to white */
 .main-content {
+  background-color: #fff;
+  padding: 20px;
   flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  align-items: center;
-  background-color: #f4f4f4;
-  overflow-y: auto;
-  padding: 20px 0;
+  width: 100%;
 }
 
 .carousel-section {
-  width: 100%;
-  padding: 20px;
+  margin-bottom: 40px;
 }
 
 .carousel-title {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 10px;
+  font-size: 22px;
+  font-weight: 450;
+  margin-bottom: 20px;
+  text-align: center;
 }
 
 .carousel {
   display: flex;
-  justify-content: center;
-  gap: 10px;
-  overflow-x: auto;
-  padding: 10px 0;
+  flex-wrap: wrap; /* Allow items to wrap onto the next line */
+  margin: -5px; /* Adjust margins for consistent spacing */
 }
 
 .carousel-item {
-  width: 320px;
-  height: 320px;
-  border-radius: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: flex-start; /* Align items to the top */
+  justify-content: space-between;
+  flex: 1 0 calc(33.33% - 10px); /* Adjust width to take 1/3 of the container */
+  margin: 5px; /* Margin around each item */
+}
+
+
+.artist-name {
   font-size: 18px;
+  margin-bottom: 10px;
+  color: black;
 }
 
 .carousel-image {
   width: 100%;
-  height: 220px; /* Adjusted to fit the price under the image */
+  height: 300px;
   object-fit: cover;
-  border-radius: 10px;
-}
-
-.artist-name {
-  margin-bottom: 5px;
-  font-size: 16px;
-  font-weight: bold;
-  color: #333;
+  border-radius: 12px;
+  margin-bottom: 10px;
 }
 
 .item-details {
   display: flex;
-  align-items: center;
-  margin-top: 10px;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 18px;
 }
 
 .price {
-  margin-right: 10px;
-  font-size: 16px;
   font-weight: bold;
-  color: #555;
+  color: black;
 }
 
 .add-button {
-  background-color: #A982AA;
+  background-color: #55434f;
   color: white;
   border: none;
-  border-radius: 4px;
+  border-radius: 25px;
   padding: 5px 10px;
   cursor: pointer;
+  font-size: 14px;
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
 
 .add-button:hover {
-  background-color: #5e495f;
+  background-color: #271b28;
   transform: scale(1.05);
 }
+
+/* Sorting Section */
+.sorting-section {
+  color: black;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.sorting-section label {
+  margin-right: 10px;
+  font-size: 16px;
+}
+
+.sorting-section select {
+  padding: 5px 10px;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+
 </style>
