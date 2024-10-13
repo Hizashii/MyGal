@@ -1,14 +1,16 @@
 <template>
   <div class="auth-page">
     <img src="@/images/mygal-logo-whitish.png" alt="MyGal Logo" class="logo">
-    <div class="intro-text">
-    </div>
+    <div class="intro-text"></div>
     
     <div class="auth-container">
       <h1>{{ isRegistering ? 'Register' : 'Sign In' }}</h1>
       <form @submit.prevent="handleSubmit">
         <input v-model="email" type="email" placeholder="Email" required />
         <input v-model="password" type="password" placeholder="Password (at least 6 characters)" required minlength="6" />
+        <div v-if="!isRegistering">
+          <input type="checkbox" v-model="isAdminLogin"> Do you have admin rights?
+        </div>
         <button type="submit">{{ isRegistering ? 'Register' : 'Log In' }}</button>
       </form>
       <button @click="toggleMode">
@@ -21,14 +23,17 @@
 <script>
 import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from '../firebaseConfig';
 import { ref } from 'vue';
-import { useRouter } from 'vue-router'; // Import useRouter
+import { useRouter } from 'vue-router';
+import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
 
 export default {
   setup() {
     const email = ref('');
     const password = ref('');
     const isRegistering = ref(false);
-    const router = useRouter(); // Get router instance
+    const isAdminLogin = ref(false); // Track if the user is trying to log in as admin
+    const router = useRouter();
+    const db = getFirestore();
 
     const toggleMode = () => {
       isRegistering.value = !isRegistering.value;
@@ -37,14 +42,41 @@ export default {
     const handleSubmit = async () => {
       try {
         if (isRegistering.value) {
-          await createUserWithEmailAndPassword(auth, email.value, password.value);
+          // Handle Registration
+          const userCredential = await createUserWithEmailAndPassword(auth, email.value, password.value);
+          const user = userCredential.user;
+
+          // Add user to Firestore with default "user" role
+          await setDoc(doc(db, "users", user.uid), {
+            email: user.email,
+            role: "user"
+          });
+
           alert('Registration successful!');
         } else {
-          await signInWithEmailAndPassword(auth, email.value, password.value);
-          alert('Login successful!');
+          // Handle Login
+          const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value);
+          const user = userCredential.user;
 
-          // Redirect to Discover page after successful login
-          router.push({ name: 'Discover' }); // Make sure 'Discover' route is defined in your router
+          // Check role if admin login is selected
+          if (isAdminLogin.value) {
+            const userDoc = await getDoc(doc(db, "users", user.uid));
+            if (userDoc.exists()) {
+              const userData = userDoc.data();
+              if (userData.role === 'admin') {
+                alert('Admin login successful!');
+                // Redirect to an admin dashboard
+                router.push({ name: 'AdminDashboard' });
+              } else {
+                alert('You do not have admin rights.');
+              }
+            } else {
+              alert('User not found.');
+            }
+          } else {
+            alert('Login successful!');
+            router.push({ name: 'Discover' });
+          }
         }
       } catch (error) {
         console.error('Error during authentication:', error);
@@ -56,12 +88,14 @@ export default {
       email,
       password,
       isRegistering,
+      isAdminLogin,
       toggleMode,
       handleSubmit,
     };
   },
 };
 </script>
+
 
 <style scoped>
 .intro-text {

@@ -6,7 +6,7 @@
     <!-- Hero Image Section -->
     <div class="hero-section">
       <video class="hero-video" autoplay muted loop>
-        <source src="@/videos/Video.mp4" type="video/mp4">
+        <source src="@/videos/Video.mp4" type="video/mp4" />
         Your browser does not support the video tag.
       </video>
       <div class="hero-text">+60 000 PEOPLE CHOSE MYGAL</div>
@@ -35,15 +35,15 @@
         <div class="carousel">
           <div class="carousel-item" v-for="item in carousel.items" :key="item.id">
             <div class="artist-name">{{ item.artist }}</div>
-            <img :src="item.image" :alt="item.artist" class="carousel-image">
+            <img :src="item.image" :alt="item.artist" class="carousel-image" />
             <div class="item-details">
               <div class="price">${{ item.price }}</div>
               <button @click="addToCart(item)" class="add-button">Add</button>
+              <button @click="removeItem(item.id)" class="remove-button">Remove</button>
             </div>
           </div>
         </div>
       </div>
-
 
       <!-- Loading and Error Handling -->
       <div v-if="loading" class="loading">Loading artworks...</div>
@@ -59,44 +59,17 @@ import { auth, signOut } from '../firebaseConfig'; // Import Firebase authentica
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
 import TopNav from '@/components/TopNav.vue'; // Import TopNav component
 
-import art1 from '@/images/more.jpg';
-import art2 from '@/images/treva.jpg';
-import art3 from '@/images/lodka.jpg';
-import art4 from '@/images/lodki.jpg';
-import art5 from '@/images/OceanWaves-SamuelEarp-OilPainting.jpg';
-import art6 from '@/images/blue.jpeg';
-import art7 from '@/images/blueblue.jpeg';
-import art8 from '@/images/pink.jpg';
-import art9 from '@/images/italia.jpg';
-
 export default {
   components: {
-    TopNav, 
+    TopNav,
   },
   setup() {
-    const router = useRouter(); 
+    const router = useRouter();
 
     const carousels = ref([
       {
-        items: [
-          { id: 1, image: art1, artist: '@kateandersen', price: 50 },
-          { id: 2, image: art2, artist: '@miketheartist', price: 75 },
-          { id: 3, image: art3, artist: '@nigelspictures', price: 100 },
-        ],
-      },
-      {
-        items: [
-          { id: 4, image: art4, artist: '@callmeart', price: 60 },
-          { id: 5, image: art5, artist: '@sealover', price: 80 },
-          { id: 6, image: art6, artist: '@bluesoul', price: 90 },
-        ],
-      },
-      {
-        items: [
-          { id: 7, image: art7, artist: '@mariaclarck', price: 70 },
-          { id: 8, image: art8, artist: '@hotartonboard', price: 85 },
-          { id: 9, image: art9, artist: '@mynameismark', price: 95 },
-        ],
+        title: "Your Artworks",
+        items: [], // Initialize empty for artworks from Firestore
       },
     ]);
 
@@ -110,14 +83,20 @@ export default {
       const discoverCollection = collection(db, 'discoverItems'); // Reference to discoverItems collection
       try {
         const snapshot = await getDocs(discoverCollection);
+        const removedIds = JSON.parse(localStorage.getItem('removedIds')) || []; // Get removed IDs from local storage
+        
         snapshot.forEach(doc => {
           const data = doc.data();
-          carousels.value[0].items.push({
-            id: doc.id,
-            image: data.image,
-            artist: data.artist,
-            price: data.price,
-          });
+          const id = doc.id;
+          // Only add items that are not in the removed list
+          if (!removedIds.includes(id)) {
+            carousels.value[0].items.push({
+              id,
+              image: data.image,
+              artist: data.artist,
+              price: data.price,
+            });
+          }
         });
       } catch (err) {
         console.error('Error fetching discover items:', err.message);
@@ -184,6 +163,19 @@ export default {
       router.push('/cart');
     };
 
+    const removeItem = (itemId) => {
+      // Store the removed item ID in local storage
+      let removedIds = JSON.parse(localStorage.getItem('removedIds')) || [];
+      removedIds.push(itemId);
+      localStorage.setItem('removedIds', JSON.stringify(removedIds));
+
+      // Find the index of the item and remove it from the carousel
+      const index = carousels.value[0].items.findIndex(item => item.id === itemId);
+      if (index !== -1) {
+        carousels.value[0].items.splice(index, 1); // Remove item from carousel
+      }
+    };
+
     return {
       carousels,
       selectedSort,
@@ -194,15 +186,14 @@ export default {
       addToCart,
       loading,
       error,
+      removeItem, // Expose the removeItem method
     };
   },
 };
 </script>
 
 <style scoped>
-
-
-
+/* Add your styles here */
 .title h1 {
   color: black;
   font-weight: 450;
@@ -225,11 +216,6 @@ export default {
   background-color: #fff;
   border-bottom: 1px solid #ddd;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
-
-.logo {
-  width: 80px;
-  height: 35px;
 }
 
 .hero-section {
@@ -265,8 +251,6 @@ export default {
 .main-content {
   background-color: #fff;
   padding: 20px;
-  flex: 1;
-  width: 100%;
 }
 
 .carousel-section {
@@ -274,27 +258,24 @@ export default {
 }
 
 .carousel-title {
-  font-size: 22px;
-  font-weight: 450;
-  margin-bottom: 20px;
-  text-align: center;
+  font-size: 24px;
+  margin-bottom: 10px;
+  color: #333;
 }
 
 .carousel {
   display: flex;
-  flex-wrap: wrap; /* Allow items to wrap onto the next line */
-  margin: -5px; /* Adjust margins for consistent spacing */
+  flex-wrap: wrap;
 }
 
 .carousel-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: space-between;
-  flex: 1 0 calc(33.33% - 10px); /* Adjust width to take 1/3 of the container */
+  flex: 1 0 21%; /* Each item takes 21% of the width */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Shadow for each item */
+  padding: 10px; /* Padding for item */
+  background-color: #f9f9f9; /* Background color for item */
+  border-radius: 8px; /* Rounded corners for item */
   margin: 5px; /* Margin around each item */
 }
-
 
 .artist-name {
   font-size: 18px;
@@ -338,6 +319,24 @@ export default {
   transform: scale(1.05);
 }
 
+/* Remove button style */
+.remove-button {
+  background-color: #d9534f; /* Bootstrap danger color */
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 10px; /* Add some space from the add button */
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.remove-button:hover {
+  background-color: #c9302c;
+  transform: scale(1.05);
+}
+
 /* Sorting Section */
 .sorting-section {
   color: black;
@@ -358,5 +357,4 @@ export default {
   border: 1px solid #ccc;
   cursor: pointer;
 }
-
 </style>
