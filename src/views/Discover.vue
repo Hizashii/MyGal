@@ -34,7 +34,7 @@
             <div class="item-details">
               <div class="price">${{ item.price }}</div>
               <button @click="addToCart(item)" class="add-button">Add</button>
-              <button @click="removeItem(item.id)" class="remove-button">Remove</button>
+              <button @click="removeItem(item)" class="remove-button">Remove</button>
             </div>
           </div>
         </div>
@@ -50,7 +50,7 @@
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { auth, signOut } from '../firebaseConfig'; 
-import { getFirestore, collection, getDocs } from 'firebase/firestore';
+import { getFirestore, collection, getDocs, deleteDoc, doc } from 'firebase/firestore';
 import TopNav from '@/components/TopNav.vue'; 
 
 export default {
@@ -59,14 +59,12 @@ export default {
   },
   setup() {
     const router = useRouter();
-
     const carousels = ref([
       {
         title: "Your Artworks",
         items: [], 
       },
     ]);
-
     const selectedSort = ref('priceAsc'); 
     const loading = ref(true); 
     const error = ref(null); 
@@ -87,6 +85,7 @@ export default {
               image: data.image,
               artist: data.artist,
               price: data.price,
+              userId: data.userId, // Assuming the userId is stored in the artwork data
             });
           }
         });
@@ -154,15 +153,26 @@ export default {
       router.push('/cart');
     };
 
-    const removeItem = (itemId) => {
-   
-      let removedIds = JSON.parse(localStorage.getItem('removedIds')) || [];
-      removedIds.push(itemId);
-      localStorage.setItem('removedIds', JSON.stringify(removedIds));
-
-      const index = carousels.value[0].items.findIndex(item => item.id === itemId);
-      if (index !== -1) {
-        carousels.value[0].items.splice(index, 1); 
+    const removeItem = async (item) => {
+      const currentUser = auth.currentUser;
+      const userRole = localStorage.getItem('userRole');
+      
+      // Check if the user is admin or the owner of the item
+      if (userRole === 'admin' || (currentUser && item.userId === currentUser.uid)) {
+        try {
+          // Delete the item from Firestore
+          await deleteDoc(doc(db, 'discoverItems', item.id));
+          // Remove from local state
+          const index = carousels.value[0].items.findIndex(i => i.id === item.id);
+          if (index !== -1) {
+            carousels.value[0].items.splice(index, 1); 
+          }
+        } catch (error) {
+          console.error('Error deleting item:', error);
+          alert('Failed to delete the artwork.');
+        }
+      } else {
+        alert('You do not have permission to delete this artwork.');
       }
     };
 
@@ -181,6 +191,8 @@ export default {
   },
 };
 </script>
+
+
 
 <style scoped>
 .title h1 {
@@ -254,15 +266,18 @@ export default {
 .carousel {
   display: flex;
   flex-wrap: wrap;
+  justify-content: flex-start;
 }
 
 .carousel-item {
-  flex: 1 0 21%; 
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
-  padding: 10px; 
-  background-color: #f9f9f9; 
-  border-radius: 8px; 
-  margin: 5px; 
+  flex: 1 0 calc(25% - 10px); /* Default 4 cards per row, accounting for margin */
+  max-width: calc(25% - 10px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+  padding: 10px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  margin: 5px;
+  transition: flex 0.2s ease;
 }
 
 .artist-name {
@@ -507,5 +522,26 @@ export default {
   border-radius: 4px;
   border: 1px solid #ccc;
   cursor: pointer;
+}
+
+@media (max-width: 1200px) {
+  .carousel-item {
+    flex: 1 0 calc(33.33% - 10px); /* 3 cards per row on medium screens */
+    max-width: calc(33.33% - 10px);
+  }
+}
+
+@media (max-width: 768px) {
+  .carousel-item {
+    flex: 1 0 calc(50% - 10px); /* 2 cards per row on smaller screens */
+    max-width: calc(50% - 10px);
+  }
+}
+
+@media (max-width: 480px) {
+  .carousel-item {
+    flex: 1 0 calc(100% - 10px); /* 1 card per row on very small screens */
+    max-width: calc(100% - 10px);
+  }
 }
 </style>

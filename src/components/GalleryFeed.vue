@@ -35,7 +35,7 @@
 <script>
 import { ref, watch, nextTick } from 'vue';
 import { db, storage } from '../firebaseConfig'; 
-import { doc, setDoc, collection, addDoc, getDoc } from 'firebase/firestore'; 
+import { doc, setDoc, collection, addDoc, getDoc, deleteDoc } from 'firebase/firestore'; 
 import { deleteObject, ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export default {
@@ -90,13 +90,15 @@ export default {
     const publishPhoto = async (photo, index) => {
       const discoverCollection = collection(db, 'discoverItems');
       try {
-        await addDoc(discoverCollection, {
+        const docRef = await addDoc(discoverCollection, {
           image: photo.url,
           artist: props.user.email,
           price: photo.price || 0,
+          userId: props.user.uid, // Store the userId for ownership reference
         });
 
         galleryPhotos.value[index].published = true; 
+        galleryPhotos.value[index].id = docRef.id; // Save the ID for future reference
         await saveUserProfile(props.user.uid, { galleryPhotos: galleryPhotos.value });
       } catch (error) {
         console.error('Error publishing photo:', error.message);
@@ -110,6 +112,12 @@ export default {
 
     const removePhoto = async (index) => {
       const photo = galleryPhotos.value[index];
+
+      // Remove from Firestore if it has been published
+      if (photo.published && photo.id) {
+        const docRef = doc(db, 'discoverItems', photo.id);
+        await deleteDoc(docRef); // Delete from discoverItems
+      }
 
       const userDocRef = doc(db, 'users', props.user.uid);
       const userDoc = await getDoc(userDocRef); 
@@ -129,11 +137,11 @@ export default {
 
       try {
         console.log('Deleting file from path:', storagePath);
-        await deleteObject(storageReference);
+        await deleteObject(storageReference); // Delete from Firebase Storage
 
-        galleryPhotos.value.splice(index, 1);
+        galleryPhotos.value.splice(index, 1); // Remove from the local gallery array
 
-        await saveUserProfile(props.user.uid, { galleryPhotos: galleryPhotos.value });
+        await saveUserProfile(props.user.uid, { galleryPhotos: galleryPhotos.value }); // Update user profile
       } catch (error) {
         console.error('Error removing photo:', error.message);
       }
@@ -157,9 +165,10 @@ export default {
 };
 </script>
 
+
 <style scoped>
 .gallery-feed {
-  color: #ffffff; 
+  color: #A982AA; 
   margin-top: 20px;
 }
 
@@ -169,8 +178,8 @@ h2 {
 }
 
 .upload-button {
-  background-color: #007bff; 
-  color: white; 
+  background-color: #A982AA; 
+  color: black; 
   border: none; 
   border-radius: 5px; 
   padding: 10px 15px;
@@ -181,7 +190,7 @@ h2 {
 }
 
 .upload-button:hover {
-  background-color: #0056b3;
+  background-color: #A982AA;
 }
 
 .gallery {
@@ -244,7 +253,7 @@ input[type="number"] {
 
 .remove-button {
   background-color: rgba(255, 0, 0, 0.8); 
-  color: white; 
+  color: black; 
   border: none; 
   border-radius: 5px; 
   padding: 5px 10px; 
@@ -258,7 +267,7 @@ input[type="number"] {
 
 .publish-button {
   background-color:  #A982AA;
-  color: white; 
+  color: black; 
   border: none; 
   border-radius: 5px; 
   padding: 5px 10px; 

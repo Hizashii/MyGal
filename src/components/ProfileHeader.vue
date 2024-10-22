@@ -141,105 +141,124 @@
   </script>
   
   <style scoped>
+
   .profile-header {
-    background: linear-gradient(135deg, #1e1e2f, #2a2a3c); 
-    border-radius: 15px; 
+    background-color: white;
+    border-radius: 15px;
     padding: 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); 
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     display: flex;
     align-items: center;
     position: relative;
-    transition: all 0.3s ease; 
+    transition: all 0.3s ease;
   }
-  
+
   .profile-header:hover {
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
   }
-  
+
+  /* Avatar */
   .avatar img {
-    width: 100px; 
-    height: 100px; 
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
-    border: 3px solid rgba(255, 255, 255, 0.5);
-    transition: transform 0.3s ease; 
+    border: 3px solid #A982AA; /* Border updated to accent color */
+    transition: transform 0.3s ease;
   }
-  
+
   .avatar img:hover {
-    transform: scale(1.05); 
+    transform: scale(1.05);
   }
-  
+
+  /* User Info */
   .user-info {
-    color: #ffffff; 
-    margin-left: 20px; 
+    color: black;
+    margin-left: 20px;
   }
-  
+
+  .user-info h1 {
+    font-size: 24px;
+    margin-bottom: 8px;
+    color: #A982AA; /* Username with accent color */
+  }
+
+  .user-info p {
+    font-size: 14px;
+    color: black;
+  }
+
   .follow-info span {
     display: inline-block;
-    margin-right: 15px; 
-    color: rgba(255, 255, 255, 0.7); 
+    margin-right: 15px;
+    color:black;
   }
-  
+
+  /* Hamburger Menu */
   .hamburger {
     cursor: pointer;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    width: 30px; 
-    height: 20px; 
-    margin-left: auto; 
+    width: 30px;
+    height: 20px;
+    margin-left: auto;
   }
-  
+
   .hamburger div {
     height: 3px;
-    background: #ffffff;
-    transition: all 0.3s ease; 
+    background: #A982AA;
+    transition: all 0.3s ease;
   }
-  
+
+  /* Opened Hamburger Animation */
   .hamburger div.open:first-child {
-    transform: rotate(45deg) translate(5px, 5px); 
+    transform: rotate(45deg) translate(5px, 5px);
   }
-  
+
   .hamburger div.open:nth-child(2) {
-    opacity: 0; 
+    opacity: 0;
   }
-  
+
   .hamburger div.open:last-child {
-    transform: rotate(-45deg) translate(5px, -5px); 
+    transform: rotate(-45deg) translate(5px, -5px);
   }
-  
+
+  /* Dropdown Menu */
   .menu {
-    position: absolute; 
-    top: 70px; 
-    right: 20px; 
-    background: rgba(255, 255, 255, 0.1); 
-    border-radius: 10px; 
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); 
-    backdrop-filter: blur(10px); 
-    padding: 10px; 
-    transition: opacity 0.3s ease; 
+    position: absolute;
+    top: 70px;
+    right: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 10px;
+    transition: opacity 0.3s ease;
   }
-  
+
+  /* Menu Buttons */
   .menu button {
-    background: none; 
-    border: none; 
-    color: white; 
-    padding: 8px 15px; 
-    border-radius: 5px; 
-    cursor: pointer; 
-    transition: background 0.3s; 
+    background: none;
+    border: none;
+    color: black;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s;
   }
-  
+
   .menu button:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: #A982AA; /* Menu buttons hover with accent color */
   }
-  
+
+  /* Fade In/Out Animations */
   .fade-enter-active,
   .fade-leave-active {
     transition: opacity 0.3s ease;
   }
+
   .fade-enter,
   .fade-leave-to {
     opacity: 0;
   }
-  </style>
-  
+</style>

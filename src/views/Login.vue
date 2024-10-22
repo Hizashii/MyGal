@@ -1,4 +1,4 @@
-and Login.vue - <template>
+<template>
   <div class="auth-page">
     <img src="@/images/mygal-logo-whitish.png" alt="MyGal Logo" class="logo">
     <div class="intro-text"></div>
@@ -24,7 +24,7 @@ and Login.vue - <template>
 import { auth, createUserWithEmailAndPassword, signInWithEmailAndPassword } from '../firebaseConfig';
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
-import { getFirestore, doc, setDoc, getDoc } from 'firebase/firestore';
+import { getFirestore, doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
 
 export default {
   setup() {
@@ -42,45 +42,45 @@ export default {
     const handleSubmit = async () => {
       try {
         if (isRegistering.value) {
-          // Handle Registration
+          // Registration logic
           const userCredential = await createUserWithEmailAndPassword(auth, email.value, password.value);
           const user = userCredential.user;
 
-          // Add user to Firestore with default "user" role
+          // New users always start with 'user' role
           await setDoc(doc(db, "users", user.uid), {
             email: user.email,
-            role: "user"
+            role: "user",
+            createdAt: serverTimestamp()
           });
-
-          alert('Registration successful!');
+          
+          router.push({ name: 'Discover' });
         } else {
-          // Handle Login
+          // Login logic
           const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value);
-          const user = userCredential.user;
+          const userDoc = await getDoc(doc(db, "users", userCredential.user.uid));
+          
+          if (userDoc.exists()) {
+            const userData = userDoc.data();
+            // Store role in localStorage for easy access
+            localStorage.setItem('userRole', userData.role);
 
-          // Check role if admin login is selected
-          if (isAdminLogin.value) {
-            const userDoc = await getDoc(doc(db, "users", user.uid));
-            if (userDoc.exists()) {
-              const userData = userDoc.data();
-              if (userData.role === 'admin') {
-                alert('Admin login successful!');
-                // Redirect to an admin dashboard
-                router.push({ name: 'AdminDashboard' });
-              } else {
-                alert('You do not have admin rights.');
-              }
-            } else {
-              alert('User not found.');
+            // Check for admin rights using hardcoded credentials
+            if (email.value === 'magebeast3@abv.bg' && password.value === '1234567') {
+              // Assign admin role if the credentials match
+              userData.role = 'admin';
+              localStorage.setItem('userRole', 'admin');
+              alert('Logged in as admin successfully!');
             }
-          } else {
-            alert('Login successful!');
+
+            // Navigate to Discover page regardless of user role
             router.push({ name: 'Discover' });
+          } else {
+            alert('User not found.');
           }
         }
       } catch (error) {
-        console.error('Error during authentication:', error);
-        alert('Error: ' + error.message);
+        console.error('Error:', error);
+        alert(error.message);
       }
     };
 
@@ -95,9 +95,6 @@ export default {
   },
 };
 </script>
-
-
-
 
 <style scoped>
 .intro-text {
