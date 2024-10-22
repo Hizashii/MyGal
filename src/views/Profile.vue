@@ -1,4 +1,3 @@
-<!-- src/views/Profile.vue -->
 <template>
   <div>
     <TopNav />
@@ -19,9 +18,9 @@
 </template>
 
 <script>
-import { ref, onMounted } from 'vue'; // Ensure you're using the right imports
-import { onAuthStateChanged } from 'firebase/auth'; // Correctly import onAuthStateChanged
-import { auth, db } from '../firebaseConfig'; // Import your Firebase setup
+import { ref, onMounted } from 'vue'; 
+import { onAuthStateChanged } from 'firebase/auth'; 
+import { auth, db } from '../firebaseConfig'; 
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import ProfileHeader from '@/components/ProfileHeader.vue';
 import GalleryFeed from '@/components/GalleryFeed.vue';
@@ -31,7 +30,7 @@ export default {
   components: {
     ProfileHeader,
     GalleryFeed,
-    TopNav, // Make sure TopNav is registered
+    TopNav, 
   },
   setup() {
     const user = ref(null);
@@ -42,7 +41,6 @@ export default {
 
     const updateProfilePhoto = (url) => {
       profilePhotoUrl.value = url;
-      // Save the updated URL to Firestore
       saveUserProfile(user.value.uid, { profilePhotoUrl: url });
     };
 
@@ -51,7 +49,6 @@ export default {
       await setDoc(docRef, data, { merge: true });
     };
 
-    // Auth State Change Listener
     onMounted(() => {
       onAuthStateChanged(auth, async (currentUser) => {
         if (currentUser) {
@@ -91,6 +88,6 @@ export default {
 .profile-page {
   display: flex;
   flex-direction: column;
-  padding: 20px; /* Add some padding to the profile page */
+  padding: 20px; 
 }
 </style>

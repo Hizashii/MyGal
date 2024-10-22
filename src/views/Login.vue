@@ -1,4 +1,4 @@
-<template>
+and Login.vue - <template>
   <div class="auth-page">
     <img src="@/images/mygal-logo-whitish.png" alt="MyGal Logo" class="logo">
     <div class="intro-text"></div>
@@ -31,7 +31,7 @@ export default {
     const email = ref('');
     const password = ref('');
     const isRegistering = ref(false);
-    const isAdminLogin = ref(false); // Track if the user is trying to log in as admin
+    const isAdminLogin = ref(false); 
     const router = useRouter();
     const db = getFirestore();
 
@@ -95,6 +95,8 @@ export default {
   },
 };
 </script>
+
+
 
 
 <style scoped>

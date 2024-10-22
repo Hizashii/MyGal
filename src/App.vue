@@ -12,7 +12,6 @@ const isFullScreen = computed(() => route.path === '/Discover');
 </template>
 
 <style scoped>
-/* Ensure the header does not interfere with full-screen views */
 header {
   line-height: 1.5;
   width: 100%;

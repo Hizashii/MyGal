@@ -1,9 +1,7 @@
 <template>
   <div class="discover-page">
-    <!-- Top Navigation -->
     <TopNav @navigate="navigate" @logOut="logOut" @goToCart="goToCart" />
 
-    <!-- Hero Image Section -->
     <div class="hero-section">
       <video class="hero-video" autoplay muted loop>
         <source src="@/videos/Video.mp4" type="video/mp4" />
@@ -12,13 +10,11 @@
       <div class="hero-text">+60 000 PEOPLE CHOSE MYGAL</div>
     </div>
 
-    <!-- Main Content -->
     <div class="main-content">
       <div class="title">
         <h1>Discover more art</h1>
       </div>
 
-      <!-- Sorting Dropdown -->
       <div class="sorting-section">
         <label for="sort-by">Sort By: </label>
         <select id="sort-by" v-model="selectedSort" @change="sortItems">
@@ -29,7 +25,6 @@
         </select>
       </div>
 
-      <!-- Carousels -->
       <div class="carousel-section" v-for="(carousel, index) in carousels" :key="index">
         <h2 class="carousel-title">{{ carousel.title }}</h2>
         <div class="carousel">
@@ -45,7 +40,6 @@
         </div>
       </div>
 
-      <!-- Loading and Error Handling -->
       <div v-if="loading" class="loading">Loading artworks...</div>
       <div v-if="error" class="error">{{ error }}</div>
     </div>
@@ -55,9 +49,9 @@
 <script>
 import { ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
-import { auth, signOut } from '../firebaseConfig'; // Import Firebase authentication and signOut
+import { auth, signOut } from '../firebaseConfig'; 
 import { getFirestore, collection, getDocs } from 'firebase/firestore';
-import TopNav from '@/components/TopNav.vue'; // Import TopNav component
+import TopNav from '@/components/TopNav.vue'; 
 
 export default {
   components: {
@@ -69,26 +63,24 @@ export default {
     const carousels = ref([
       {
         title: "Your Artworks",
-        items: [], // Initialize empty for artworks from Firestore
+        items: [], 
       },
     ]);
 
-    const selectedSort = ref('priceAsc'); // Default sorting option
-    const loading = ref(true); // Loading state
-    const error = ref(null); // Error state
-    const db = getFirestore(); // Initialize Firestore
+    const selectedSort = ref('priceAsc'); 
+    const loading = ref(true); 
+    const error = ref(null); 
+    const db = getFirestore(); 
 
-    // Fetching artworks from Firestore
     const fetchDiscoverItems = async () => {
-      const discoverCollection = collection(db, 'discoverItems'); // Reference to discoverItems collection
+      const discoverCollection = collection(db, 'discoverItems'); 
       try {
         const snapshot = await getDocs(discoverCollection);
-        const removedIds = JSON.parse(localStorage.getItem('removedIds')) || []; // Get removed IDs from local storage
+        const removedIds = JSON.parse(localStorage.getItem('removedIds')) || []; 
         
         snapshot.forEach(doc => {
           const data = doc.data();
           const id = doc.id;
-          // Only add items that are not in the removed list
           if (!removedIds.includes(id)) {
             carousels.value[0].items.push({
               id,
@@ -107,22 +99,21 @@ export default {
     };
 
     onMounted(() => {
-      fetchDiscoverItems(); // Fetch artworks on component mount
+      fetchDiscoverItems(); 
     });
 
-    // Sorting logic
     const sortItems = () => {
       carousels.value.forEach(carousel => {
         carousel.items.sort((a, b) => {
           switch (selectedSort.value) {
             case 'priceAsc':
-              return a.price - b.price; // Sort by price ascending
+              return a.price - b.price; 
             case 'priceDesc':
-              return b.price - a.price; // Sort by price descending
+              return b.price - a.price; 
             case 'nameAsc':
-              return a.artist.localeCompare(b.artist); // Sort by name A-Z
+              return a.artist.localeCompare(b.artist); 
             case 'nameDesc':
-              return b.artist.localeCompare(a.artist); // Sort by name Z-A
+              return b.artist.localeCompare(a.artist); 
             default:
               return 0;
           }
@@ -140,7 +131,7 @@ export default {
 
     const logOut = async () => {
       try {
-        await signOut(auth); // Use Firebase's signOut method to log out
+        await signOut(auth); 
         router.push('/login');
       } catch (error) {
         console.error('Error during sign out:', error.message);
@@ -164,15 +155,14 @@ export default {
     };
 
     const removeItem = (itemId) => {
-      // Store the removed item ID in local storage
+   
       let removedIds = JSON.parse(localStorage.getItem('removedIds')) || [];
       removedIds.push(itemId);
       localStorage.setItem('removedIds', JSON.stringify(removedIds));
 
-      // Find the index of the item and remove it from the carousel
       const index = carousels.value[0].items.findIndex(item => item.id === itemId);
       if (index !== -1) {
-        carousels.value[0].items.splice(index, 1); // Remove item from carousel
+        carousels.value[0].items.splice(index, 1); 
       }
     };
 
@@ -186,14 +176,13 @@ export default {
       addToCart,
       loading,
       error,
-      removeItem, // Expose the removeItem method
+      removeItem, 
     };
   },
 };
 </script>
 
 <style scoped>
-/* Add your styles here */
 .title h1 {
   color: black;
   font-weight: 450;
@@ -247,7 +236,6 @@ export default {
   z-index: 1;
 }
 
-/* Set main-content background to white */
 .main-content {
   background-color: #fff;
   padding: 20px;
@@ -269,12 +257,12 @@ export default {
 }
 
 .carousel-item {
-  flex: 1 0 21%; /* Each item takes 21% of the width */
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Shadow for each item */
-  padding: 10px; /* Padding for item */
-  background-color: #f9f9f9; /* Background color for item */
-  border-radius: 8px; /* Rounded corners for item */
-  margin: 5px; /* Margin around each item */
+  flex: 1 0 21%; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
+  padding: 10px; 
+  background-color: #f9f9f9; 
+  border-radius: 8px; 
+  margin: 5px; 
 }
 
 .artist-name {
@@ -319,16 +307,179 @@ export default {
   transform: scale(1.05);
 }
 
-/* Remove button style */
 .remove-button {
-  background-color: #d9534f; /* Bootstrap danger color */
+  background-color: #d9534f; 
   color: white;
   border: none;
   border-radius: 25px;
   padding: 5px 10px;
   cursor: pointer;
   font-size: 14px;
-  margin-left: 10px; /* Add some space from the add button */
+  margin-left: 10px; 
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.remove-button:hover {
+  background-color: #c9302c;
+  transform: scale(1.05);
+}
+
+/* Sorting Section */
+.sorting-section {
+  color: black;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.sorting-section label {
+  margin-right: 10px;
+  font-size: 16px;
+}
+
+.sorting-section select {
+  padding: 5px 10px;
+  font-size: 16px;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+  cursor: pointer;
+}
+</style>
+
+<style scoped>
+.title h1 {
+  color: black;
+  font-weight: 450;
+}
+
+.discover-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100vw;
+  margin: 0;
+  overflow-y: auto;
+}
+
+.top-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 20px;
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.hero-section {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  overflow: hidden;
+}
+
+.hero-video {
+  opacity: 70%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: -1;
+}
+
+.hero-text {
+  position: absolute;
+  bottom: 230px;
+  left: 50%;
+  transform: translateX(-50%);
+  color: white;
+  font-size: 24px;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+  z-index: 1;
+}
+
+.main-content {
+  background-color: #fff;
+  padding: 20px;
+}
+
+.carousel-section {
+  margin-bottom: 40px;
+}
+
+.carousel-title {
+  font-size: 24px;
+  margin-bottom: 10px;
+  color: #333;
+}
+
+.carousel {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.carousel-item {
+  flex: 1 0 21%; 
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
+  padding: 10px; 
+  background-color: #f9f9f9; 
+  border-radius: 8px; 
+  margin: 5px; 
+}
+
+.artist-name {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: black;
+}
+
+.carousel-image {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.item-details {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  font-size: 18px;
+}
+
+.price {
+  font-weight: bold;
+  color: black;
+}
+
+.add-button {
+  background-color: #55434f;
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background-color 0.3s ease, transform 0.3s ease;
+}
+
+.add-button:hover {
+  background-color: #271b28;
+  transform: scale(1.05);
+}
+
+.remove-button {
+  background-color: #d9534f; 
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 5px 10px;
+  cursor: pointer;
+  font-size: 14px;
+  margin-left: 10px; 
   transition: background-color 0.3s ease, transform 0.3s ease;
 }
 

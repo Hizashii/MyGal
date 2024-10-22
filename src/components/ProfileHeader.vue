@@ -19,21 +19,18 @@
         </div>
       </div>
   
-      <!-- Hamburger Menu Button -->
       <div class="hamburger" @click="toggleMenu">
         <div :class="{ open: isMenuOpen }"></div>
         <div :class="{ open: isMenuOpen }"></div>
         <div :class="{ open: isMenuOpen }"></div>
       </div>
   
-      <!-- Menu Items -->
       <transition name="fade">
         <div class="menu" v-if="isMenuOpen">
           <button @click="triggerProfilePhotoUpload">Upload Profile Photo</button>
         </div>
       </transition>
-  
-      <!-- Hidden Inputs for Gallery Upload -->
+
       <input
         ref="galleryPhotoInput"
         type="file"
@@ -47,7 +44,7 @@
   
   <script>
   import { ref, nextTick } from 'vue';
-  import { storage } from '../firebaseConfig'; // Ensure the storage is imported
+  import { storage } from '../firebaseConfig'; 
   import { ref as storageRef, uploadBytes, getDownloadURL } from 'firebase/storage';
   
   export default {
@@ -79,8 +76,8 @@
       };
   
       const triggerProfilePhotoUpload = async () => {
-        await nextTick(); // Ensure the DOM is updated
-        profilePhotoInput.value?.click(); // Use optional chaining
+        await nextTick(); 
+        profilePhotoInput.value?.click(); 
       };
   
       const uploadProfilePhoto = async (event) => {
@@ -95,20 +92,20 @@
         try {
           await uploadBytes(storageReference, file);
           const url = await getDownloadURL(storageReference);
-          emit('updateProfilePhoto', url); // Emit event to parent component
+          emit('updateProfilePhoto', url); 
         } catch (error) {
           console.error('Error uploading profile photo:', error.message);
         }
       };
   
       const triggerGalleryPhotoUpload = async () => {
-        await nextTick(); // Ensure the DOM is updated
-        galleryPhotoInput.value?.click(); // Use optional chaining
+        await nextTick();
+        galleryPhotoInput.value?.click(); 
       };
   
       const preparePhotosForUpload = async (event) => {
         const files = Array.from(event.target.files);
-        if (!files.length) return; // If no files, do nothing
+        if (!files.length) return; 
         for (const file of files) {
           await uploadPhotoToGallery(file);
         }
@@ -123,7 +120,7 @@
         try {
           await uploadBytes(storageReference, file);
           const url = await getDownloadURL(storageReference);
-          emit('addPhotoToGallery', { url, price: 0, published: false }); // Emit event to parent component
+          emit('addPhotoToGallery', { url, price: 0, published: false }); 
         } catch (error) {
           console.error('Error uploading gallery photo:', error.message);
         }
@@ -136,8 +133,8 @@
         uploadProfilePhoto,
         triggerGalleryPhotoUpload,
         preparePhotosForUpload,
-        profilePhotoInput, // Expose the ref for the profile photo input
-        galleryPhotoInput, // Expose the ref for the gallery photo input
+        profilePhotoInput, 
+        galleryPhotoInput, 
       };
     },
   };
@@ -145,41 +142,41 @@
   
   <style scoped>
   .profile-header {
-    background: linear-gradient(135deg, #1e1e2f, #2a2a3c); /* Futuristic gradient background */
-    border-radius: 15px; /* Rounded corners */
+    background: linear-gradient(135deg, #1e1e2f, #2a2a3c); 
+    border-radius: 15px; 
     padding: 20px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); /* Soft shadow for depth */
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3); 
     display: flex;
     align-items: center;
-    position: relative; /* Needed for the dropdown menu */
-    transition: all 0.3s ease; /* Smooth transitions for hover effects */
+    position: relative;
+    transition: all 0.3s ease; 
   }
   
   .profile-header:hover {
-    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5); /* Enhanced shadow on hover */
+    box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
   }
   
   .avatar img {
-    width: 100px; /* Example size */
-    height: 100px; /* Example size */
+    width: 100px; 
+    height: 100px; 
     border-radius: 50%;
-    border: 3px solid rgba(255, 255, 255, 0.5); /* Semi-transparent border */
-    transition: transform 0.3s ease; /* Smooth scale effect */
+    border: 3px solid rgba(255, 255, 255, 0.5);
+    transition: transform 0.3s ease; 
   }
   
   .avatar img:hover {
-    transform: scale(1.05); /* Scale up on hover */
+    transform: scale(1.05); 
   }
   
   .user-info {
-    color: #ffffff; /* Text color */
-    margin-left: 20px; /* Spacing between avatar and user info */
+    color: #ffffff; 
+    margin-left: 20px; 
   }
   
   .follow-info span {
     display: inline-block;
-    margin-right: 15px; /* Spacing between following/followers */
-    color: rgba(255, 255, 255, 0.7); /* Slightly transparent white */
+    margin-right: 15px; 
+    color: rgba(255, 255, 255, 0.7); 
   }
   
   .hamburger {
@@ -187,62 +184,61 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    width: 30px; /* Hamburger width */
-    height: 20px; /* Hamburger height */
-    margin-left: auto; /* Push to the right */
+    width: 30px; 
+    height: 20px; 
+    margin-left: auto; 
   }
   
   .hamburger div {
     height: 3px;
-    background: #ffffff; /* Hamburger lines color */
-    transition: all 0.3s ease; /* Smooth transitions for animations */
+    background: #ffffff;
+    transition: all 0.3s ease; 
   }
   
   .hamburger div.open:first-child {
-    transform: rotate(45deg) translate(5px, 5px); /* Top line */
+    transform: rotate(45deg) translate(5px, 5px); 
   }
   
   .hamburger div.open:nth-child(2) {
-    opacity: 0; /* Hide middle line */
+    opacity: 0; 
   }
   
   .hamburger div.open:last-child {
-    transform: rotate(-45deg) translate(5px, -5px); /* Bottom line */
+    transform: rotate(-45deg) translate(5px, -5px); 
   }
   
   .menu {
-    position: absolute; /* Dropdown menu positioning */
-    top: 70px; /* Distance from the header */
-    right: 20px; /* Distance from the right */
-    background: rgba(255, 255, 255, 0.1); /* Transparent background */
-    border-radius: 10px; /* Rounded corners */
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Soft shadow */
-    backdrop-filter: blur(10px); /* Frosted glass effect */
-    padding: 10px; /* Padding inside menu */
-    transition: opacity 0.3s ease; /* Smooth fade effect */
+    position: absolute; 
+    top: 70px; 
+    right: 20px; 
+    background: rgba(255, 255, 255, 0.1); 
+    border-radius: 10px; 
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); 
+    backdrop-filter: blur(10px); 
+    padding: 10px; 
+    transition: opacity 0.3s ease; 
   }
   
   .menu button {
-    background: none; /* No background */
-    border: none; /* No border */
-    color: white; /* Text color */
-    padding: 8px 15px; /* Button padding */
-    border-radius: 5px; /* Rounded button */
-    cursor: pointer; /* Pointer cursor */
-    transition: background 0.3s; /* Transition for hover */
+    background: none; 
+    border: none; 
+    color: white; 
+    padding: 8px 15px; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    transition: background 0.3s; 
   }
   
   .menu button:hover {
-    background: rgba(255, 255, 255, 0.2); /* Light hover effect */
+    background: rgba(255, 255, 255, 0.2);
   }
   
-  /* Transition effects */
   .fade-enter-active,
   .fade-leave-active {
     transition: opacity 0.3s ease;
   }
   .fade-enter,
-  .fade-leave-to /* .fade-leave-active in <2.1.8 */ {
+  .fade-leave-to {
     opacity: 0;
   }
   </style>
