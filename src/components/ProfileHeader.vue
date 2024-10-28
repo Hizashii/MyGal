@@ -139,9 +139,7 @@
     },
   };
   </script>
-  
   <style scoped>
-
   .profile-header {
     background-color: white;
     border-radius: 15px;
@@ -151,13 +149,18 @@
     align-items: center;
     position: relative;
     transition: all 0.3s ease;
+    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
   }
-
+  
   .profile-header:hover {
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
   }
-
+  
   /* Avatar */
+  .avatar {
+    cursor: pointer; /* Added cursor to indicate clickable */
+  }
+  
   .avatar img {
     width: 100px;
     height: 100px;
@@ -165,34 +168,40 @@
     border: 3px solid #A982AA; /* Border updated to accent color */
     transition: transform 0.3s ease;
   }
-
+  
   .avatar img:hover {
     transform: scale(1.05);
   }
-
+  
   /* User Info */
   .user-info {
     color: black;
     margin-left: 20px;
+    flex: 1; /* Allow user info to take remaining space */
   }
-
+  
   .user-info h1 {
     font-size: 24px;
     margin-bottom: 8px;
     color: #A982AA; /* Username with accent color */
   }
-
+  
   .user-info p {
     font-size: 14px;
     color: black;
   }
-
+  
+  .follow-info {
+    display: flex;
+    flex-wrap: wrap; /* Allow follow info to wrap */
+  }
+  
   .follow-info span {
     display: inline-block;
     margin-right: 15px;
-    color:black;
+    color: black;
   }
-
+  
   /* Hamburger Menu */
   .hamburger {
     cursor: pointer;
@@ -203,26 +212,26 @@
     height: 20px;
     margin-left: auto;
   }
-
+  
   .hamburger div {
     height: 3px;
     background: #A982AA;
     transition: all 0.3s ease;
   }
-
+  
   /* Opened Hamburger Animation */
   .hamburger div.open:first-child {
     transform: rotate(45deg) translate(5px, 5px);
   }
-
+  
   .hamburger div.open:nth-child(2) {
     opacity: 0;
   }
-
+  
   .hamburger div.open:last-child {
     transform: rotate(-45deg) translate(5px, -5px);
   }
-
+  
   /* Dropdown Menu */
   .menu {
     position: absolute;
@@ -235,7 +244,7 @@
     padding: 10px;
     transition: opacity 0.3s ease;
   }
-
+  
   /* Menu Buttons */
   .menu button {
     background: none;
@@ -246,19 +255,67 @@
     cursor: pointer;
     transition: background 0.3s;
   }
-
+  
   .menu button:hover {
     background: #A982AA; /* Menu buttons hover with accent color */
   }
-
+  
   /* Fade In/Out Animations */
   .fade-enter-active,
   .fade-leave-active {
     transition: opacity 0.3s ease;
   }
-
+  
   .fade-enter,
   .fade-leave-to {
     opacity: 0;
   }
-</style>
+  
+ /* Responsive Styles */
+@media (max-width: 480px) {
+  .profile-header {
+    flex-direction: column; /* Stack elements vertically */
+    align-items: center; /* Center align */
+    padding: 15px; /* Adjust padding */
+  }
+
+  .avatar img {
+    width: 80px; /* Smaller avatar size */
+    height: 80px; /* Smaller avatar size */
+  }
+
+  .user-info {
+    text-align: center; /* Center text */
+    margin-left: 0; /* Remove left margin */
+    margin-top: 10px; /* Add space above */
+  }
+
+  .user-info h1 {
+    font-size: 20px; /* Responsive font size */
+  }
+
+  .user-info p {
+    font-size: 12px; /* Responsive font size */
+  }
+
+  .follow-info {
+    display: flex;
+    flex-direction: column; /* Stack on small screens */
+    align-items: center; /* Center align */
+    margin-top: 10px; /* Add space above */
+  }
+
+  .hamburger {
+    margin-left: auto; /* Keep it aligned to the right */
+  }
+
+  .menu {
+    top: 60px; /* Adjust position for smaller screens */
+  }
+
+  .menu button {
+    padding: 6px 10px; /* Reduced padding */
+  }
+}
+
+  </style>

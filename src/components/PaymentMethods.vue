@@ -26,20 +26,49 @@
 </template>
   
 <script>
+import { getFirestore, deleteDoc, doc } from 'firebase/firestore';
+import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+
 export default {
-  data() {
-    return {
-      selectedPaymentMethod: '',
-    };
-  },
-  methods: {
-    completePurchase() {
-      if (this.selectedPaymentMethod) {
-        alert(`Payment method selected: ${this.selectedPaymentMethod}`);
-      } else {
+  setup() {
+    const router = useRouter();
+    const db = getFirestore();
+    const selectedPaymentMethod = ref('');
+
+    const completePurchase = async () => {
+      if (!selectedPaymentMethod.value) {
         alert('Please select a payment method.');
+        return;
       }
-    }
+
+      try {
+        // Get cart items from localStorage
+        const cartItems = JSON.parse(localStorage.getItem('cartItems')) || [];
+        
+        // Delete each purchased item from Firestore
+        for (const item of cartItems) {
+          await deleteDoc(doc(db, 'discoverItems', item.id));
+        }
+
+        // Clear the cart
+        localStorage.removeItem('cartItems');
+
+        // Show success message
+        alert('Purchase completed successfully! The items will be removed from the gallery.');
+
+        // Redirect to discover page
+        router.push('/discover');
+      } catch (error) {
+        console.error('Error completing purchase:', error);
+        alert('There was an error processing your purchase. Please try again.');
+      }
+    };
+
+    return {
+      selectedPaymentMethod,
+      completePurchase
+    };
   }
 };
 </script>
