@@ -9,7 +9,7 @@
         <input v-model="email" type="email" placeholder="Email" required />
         <input v-model="password" type="password" placeholder="Password (at least 6 characters)" required minlength="6" />
         <div v-if="!isRegistering">
-          <input type="checkbox" v-model="isAdminLogin"> Do you have admin rights?
+          <!-- <input type="checkbox" v-model="isAdminLogin"> Do you have admin rights? -->
         </div>
         <button type="submit">{{ isRegistering ? 'Register' : 'Log In' }}</button>
       </form>

@@ -149,23 +149,22 @@
     align-items: center;
     position: relative;
     transition: all 0.3s ease;
-    flex-wrap: wrap; /* Allow items to wrap on smaller screens */
+    flex-wrap: wrap; 
   }
   
   .profile-header:hover {
     box-shadow: 0 8px 40px rgba(0, 0, 0, 0.5);
   }
   
-  /* Avatar */
   .avatar {
-    cursor: pointer; /* Added cursor to indicate clickable */
+    cursor: pointer; 
   }
   
   .avatar img {
     width: 100px;
     height: 100px;
     border-radius: 50%;
-    border: 3px solid #A982AA; /* Border updated to accent color */
+    border: 3px solid #A982AA;
     transition: transform 0.3s ease;
   }
   
@@ -173,17 +172,16 @@
     transform: scale(1.05);
   }
   
-  /* User Info */
   .user-info {
     color: black;
     margin-left: 20px;
-    flex: 1; /* Allow user info to take remaining space */
+    flex: 1; 
   }
   
   .user-info h1 {
     font-size: 24px;
     margin-bottom: 8px;
-    color: #A982AA; /* Username with accent color */
+    color: #A982AA; 
   }
   
   .user-info p {
@@ -193,7 +191,7 @@
   
   .follow-info {
     display: flex;
-    flex-wrap: wrap; /* Allow follow info to wrap */
+    flex-wrap: wrap; 
   }
   
   .follow-info span {
@@ -202,7 +200,6 @@
     color: black;
   }
   
-  /* Hamburger Menu */
   .hamburger {
     cursor: pointer;
     display: flex;
@@ -219,7 +216,6 @@
     transition: all 0.3s ease;
   }
   
-  /* Opened Hamburger Animation */
   .hamburger div.open:first-child {
     transform: rotate(45deg) translate(5px, 5px);
   }
@@ -232,7 +228,7 @@
     transform: rotate(-45deg) translate(5px, -5px);
   }
   
-  /* Dropdown Menu */
+
   .menu {
     position: absolute;
     top: 70px;
@@ -245,7 +241,6 @@
     transition: opacity 0.3s ease;
   }
   
-  /* Menu Buttons */
   .menu button {
     background: none;
     border: none;
@@ -257,10 +252,9 @@
   }
   
   .menu button:hover {
-    background: #A982AA; /* Menu buttons hover with accent color */
+    background: #A982AA; 
   }
   
-  /* Fade In/Out Animations */
   .fade-enter-active,
   .fade-leave-active {
     transition: opacity 0.3s ease;
@@ -270,51 +264,50 @@
   .fade-leave-to {
     opacity: 0;
   }
-  
- /* Responsive Styles */
+
 @media (max-width: 480px) {
   .profile-header {
-    flex-direction: column; /* Stack elements vertically */
-    align-items: center; /* Center align */
-    padding: 15px; /* Adjust padding */
+    flex-direction: column; 
+    align-items: center; 
+    padding: 15px; 
   }
 
   .avatar img {
-    width: 80px; /* Smaller avatar size */
-    height: 80px; /* Smaller avatar size */
+    width: 80px;
+    height: 80px;
   }
 
   .user-info {
-    text-align: center; /* Center text */
-    margin-left: 0; /* Remove left margin */
-    margin-top: 10px; /* Add space above */
+    text-align: center; 
+    margin-left: 0; 
+    margin-top: 10px; 
   }
 
   .user-info h1 {
-    font-size: 20px; /* Responsive font size */
+    font-size: 20px; 
   }
 
   .user-info p {
-    font-size: 12px; /* Responsive font size */
+    font-size: 12px; 
   }
 
   .follow-info {
     display: flex;
-    flex-direction: column; /* Stack on small screens */
-    align-items: center; /* Center align */
-    margin-top: 10px; /* Add space above */
+    flex-direction: column; 
+    align-items: center; 
+    margin-top: 10px; 
   }
 
   .hamburger {
-    margin-left: auto; /* Keep it aligned to the right */
+    margin-left: auto; 
   }
 
   .menu {
-    top: 60px; /* Adjust position for smaller screens */
+    top: 60px; 
   }
 
   .menu button {
-    padding: 6px 10px; /* Reduced padding */
+    padding: 6px 10px; 
   }
 }
 

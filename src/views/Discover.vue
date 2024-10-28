@@ -55,32 +55,35 @@
                     <i class="fas fa-heart"></i>
                     {{ item.likes?.length || 0 }}
                   </button>
+
                   <button @click="showCommentModal(item)" class="comment-button">
                     <i class="fas fa-comment"></i>
                     {{ item.comments?.length || 0 }}
                   </button>
+
                 </div>
               </div>
             </div>
 
             <!-- Comments section (collapsed by default) -->
             <div v-if="item.showComments" class="comments-section">
-              <div class="comments-list">
-                <div v-for="comment in item.comments" :key="comment.id" class="comment">
-                  <strong>{{ comment.username }}:</strong> {{ comment.text }}
-                </div>
-              </div>
-              <div class="comment-input">
-                <input 
-                  v-model="newComments[item.id]" 
-                  placeholder="Add a comment..."
-                  @keyup.enter="addComment(item)"
-                />
-                <button @click="addComment(item)" class="submit-comment">
-                  <i class="fas fa-paper-plane"></i>
-                </button>
-              </div>
+               <div class="comments-list">
+                   <div v-for="comment in item.comments" :key="comment.id" class="comment">
+                      <strong>{{ comment.username }}:</strong> {{ comment.text }}
+                   
+               </div>
             </div>
+  <div class="comment-input">
+    <input 
+      v-model="newComments[item.id]" 
+      placeholder="Add a comment..."
+      @keyup.enter="addComment(item)"
+    />
+    <button @click="addComment(item)" class="submit-comment">
+      <i class="fas fa-paper-plane"></i>
+    </button>
+  </div>
+</div>
           </div>
         </div>
       </div>
@@ -116,6 +119,18 @@ export default {
 
     const currentUser = computed(() => auth.currentUser);
     const isAdmin = computed(() => localStorage.getItem('userRole') === 'admin');
+
+    onMounted(() => {
+  const discoverRef = collection(db, 'discoverItems');
+  onSnapshot(discoverRef, (snapshot) => {
+    carousels.value[0].items = snapshot.docs.map(doc => ({
+      ...doc.data(),
+      id: doc.id
+    }));
+  });
+});
+
+   
 
     const fetchDiscoverItems = async () => {
       const discoverCollection = collection(db, 'discoverItems');
@@ -202,7 +217,7 @@ export default {
         try {
           // Delete the item from Firestore
           await deleteDoc(doc(db, 'discoverItems', item.id));
-          // Remove from local state
+
           const index = carousels.value[0].items.findIndex(i => i.id === item.id);
           if (index !== -1) {
             carousels.value[0].items.splice(index, 1); 
@@ -246,7 +261,7 @@ export default {
     const logOut = async () => {
       try {
         await signOut(auth); 
-        localStorage.removeItem('userRole'); // Clear user role on logout
+        localStorage.removeItem('userRole'); 
         router.push('/login');
       } catch (error) {
         console.error('Error during sign out:', error.message);
@@ -334,23 +349,23 @@ export default {
   top: 50%;
   left: 50%;
   width: 100%;
-  height: auto; /* Adjust height to maintain aspect ratio */
-  transform: translate(-50%, -50%); /* Center the video */
-  min-height: 100%; /* Ensure it covers the section */
-  object-fit: cover; /* Maintain aspect ratio while covering the section */
+  height: auto; 
+  transform: translate(-50%, -50%); 
+  min-height: 100%; 
+  object-fit: cover; 
   z-index: -1;
 }
 
 .hero-text {
   position: absolute;
-  bottom: 230px; /* Fixed distance from the bottom */
+  bottom: 230px; 
   left: 50%;
   transform: translateX(-50%);
   color: white;
-  font-size: 24px; /* Base font size */
+  font-size: 24px; 
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
   z-index: 1;
-  text-align: center; /* Center the text */
+  text-align: center;
 }
 
 .main-content {
@@ -375,7 +390,7 @@ export default {
 }
 
 .carousel-item {
-  flex: 1 0 calc(25% - 10px); /* Default 4 cards per row, accounting for margin */
+  flex: 1 0 calc(25% - 10px); 
   max-width: calc(25% - 10px);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
   padding: 10px;
@@ -404,20 +419,20 @@ export default {
 .add-button,
 .remove-button {
   margin-left: 10px;
-  background-color: #55434f; /* Button background color */
-  color: white; /* Button text color */
-  border: none; /* No border */
-  border-radius: 5px; /* Rounded corners */
-  padding: 8px 12px; /* Padding for buttons */
-  cursor: pointer; /* Pointer cursor on hover */
-  transition: background-color 0.3s ease; /* Smooth background color transition */
+  background-color: #55434f; 
+  color: white; 
+  border: none; 
+  border-radius: 5px; 
+  padding: 8px 12px; 
+  cursor: pointer; 
+  transition: background-color 0.3s ease; 
 }
 
 .like-button:hover,
 .comment-button:hover,
 .add-button:hover,
 .remove-button:hover {
-  background-color: #55434f; /* Darker background on hover */
+  background-color: #55434f; 
 }
 
 .comments-section {
@@ -432,23 +447,23 @@ export default {
 .comment-input input {
   flex: 1;
   margin-right: 5px;
-  padding: 8px; /* Added padding for input field */
-  border: 1px solid #ccc; /* Light border */
-  border-radius: 5px; /* Rounded corners for input */
+  padding: 8px; 
+  border: 1px solid #ccc; 
+  border-radius: 5px; 
 }
 
 .submit-comment {
-  background-color: #007bff; /* Blue background */
-  color: white; /* White text color */
-  border: none; /* No border */
-  padding: 5px 10px; /* Padding for the submit button */
-  cursor: pointer; /* Pointer cursor on hover */
-  border-radius: 5px; /* Rounded corners */
-  transition: background-color 0.3s ease; /* Smooth transition */
+  background-color: #007bff; 
+  color: white; 
+  border: none; 
+  padding: 5px 10px; 
+  cursor: pointer; 
+  border-radius: 5px; 
+  transition: background-color 0.3s ease; 
 }
 
 .submit-comment:hover {
-  background-color: #0056b3; /* Darker blue on hover */
+  background-color: #0056b3; 
 }
 
 .item-details {
@@ -465,29 +480,32 @@ export default {
 
 .add-button,
 .remove-button {
-  border-radius: 25px; /* Rounded corners */
-  padding: 5px 10px; /* Padding */
-  cursor: pointer; /* Pointer cursor on hover */
-  font-size: 14px; /* Font size */
-  transition: background-color 0.3s ease, transform 0.3s ease; /* Smooth transition */
+  border-radius: 25px; 
+  padding: 5px 10px;
+  cursor: pointer; 
+  font-size: 14px; 
+  transition: background-color 0.3s ease, transform 0.3s ease; 
 }
 
 .add-button:hover {
-  background-color: #271b28; /* Darker color on hover */
-  transform: scale(1.05); /* Slightly enlarge on hover */
+  background-color: #271b28; 
+  transform: scale(1.05); 
 }
 
 .remove-button {
-  background-color: #d9534f; /* Button background color */
-  margin-left: 10px; /* Space between buttons */
+  background-color: #d9534f; 
+  margin-left: 10px; 
 }
 
 .remove-button:hover {
-  background-color: #c9302c; /* Darker color on hover */
-  transform: scale(1.05); /* Slightly enlarge on hover */
+  background-color: #c9302c; 
+  transform: scale(1.05); 
 }
 
-/* Sorting Section */
+.comment {
+  color: black; 
+}
+
 .sorting-section {
   color: black;
   display: flex;
@@ -503,9 +521,21 @@ export default {
 .sorting-section select {
   padding: 5px 10px;
   font-size: 16px;
-  border-radius: 4px; /* Rounded corners */
-  border: 1px solid #ccc; /* Light border */
-  cursor: pointer; /* Pointer cursor on hover */
+  border-radius: 4px; 
+  border: 1px solid #ccc; 
+  cursor: pointer; 
+}
+
+.delete-comment-button {
+  background: none;
+  border: none;
+  color: red; /* Change to your preferred color */
+  cursor: pointer;
+  margin-left: 10px; /* Add some spacing */
+}
+
+.delete-comment-button:hover {
+  opacity: 0.7; /* Add a hover effect */
 }
 
 /* Responsive Styles */
@@ -514,14 +544,14 @@ export default {
     display: none;
   }
   .carousel-item {
-    flex: 1 0 calc(33.33% - 10px); /* 3 cards per row */
+    flex: 1 0 calc(33.33% - 10px);
     max-width: calc(33.33% - 10px);
   }
 }
 
 @media (max-width: 800px) {
   .carousel-item {
-    flex: 1 0 calc(50% - 10px); /* 2 cards per row */
+    flex: 1 0 calc(50% - 10px); 
     max-width: calc(50% - 10px);
   }
 
@@ -529,20 +559,20 @@ export default {
     display: none;
   }
   .hero-section {
-    height: 300px; /* Adjust height for smaller screens */
+    height: 300px; 
   }
 
   .hero-video {
-    object-fit: cover; /* Ensure the video covers the hero section */
-    width: 100%; /* Full width */
-    height: auto; /* Auto height */
+    object-fit: cover; 
+    width: 100%; 
+    height: auto; 
   }
 
 }
 
 @media (max-width: 500px) {
   .carousel-item {
-    flex: 1 0 100%; /* 1 card per row */
+    flex: 1 0 100%;
     max-width: 100%;
   }
 
@@ -551,29 +581,29 @@ export default {
   }
 
   .hero-section {
-    height: 200px; /* Further adjust height for very small screens */
+    height: 200px; 
   }
 
   .hero-video {
-    object-fit: cover; /* Ensure the video covers the hero section */
-    width: 100%; /* Full width */
-    height: auto; /* Auto height */
+    object-fit: cover; 
+    width: 100%; 
+    height: auto; 
   }
 
 
   .top-nav {
-    flex-direction: column; /* Stack items in the nav */
-    padding: 10px; /* Reduced padding */
+    flex-direction: column; 
+    padding: 10px; 
   }
 
   .sorting-section {
-    flex-direction: column; /* Stack sorting options */
-    align-items: flex-start; /* Align to the start */
+    flex-direction: column; 
+    align-items: flex-start;
   }
 
   .sorting-section label,
   .sorting-section select {
-    margin-bottom: 5px; /* Spacing between elements */
+    margin-bottom: 5px;
   }
 }
 </style>

@@ -29,20 +29,20 @@ import { auth, signOut } from '../firebaseConfig';
 export default {
   setup() {
     const router = useRouter();
-    const isMenuOpen = ref(false); // State to manage menu visibility
+    const isMenuOpen = ref(false); 
 
     const toggleMenu = () => {
-      isMenuOpen.value = !isMenuOpen.value; // Toggle menu open state
+      isMenuOpen.value = !isMenuOpen.value; 
     };
 
     const navigate = (page) => {
       router.push(`/${page}`);
-      isMenuOpen.value = false; // Close menu after navigation
+      isMenuOpen.value = false; 
     };
 
     const goToCart = () => {
       router.push('/cart');
-      isMenuOpen.value = false; // Close menu after navigation
+      isMenuOpen.value = false;
     };
 
     const logOut = async () => {
@@ -82,7 +82,7 @@ export default {
 }
 
 .hamburger {
-    display: none; /* Hide hamburger icon by default */
+    display: none; 
     flex-direction: column;
     cursor: pointer;
 }
@@ -92,7 +92,7 @@ export default {
     height: 3px;
     background-color: #0e0d0d;
     margin: 4px 0;
-    transition: 0.4s; /* Smooth transition */
+    transition: 0.4s;
 }
 
 .nav-buttons {
@@ -131,30 +131,29 @@ export default {
     height: 24px;
 }
 
-/* Responsive Styles */
 @media (max-width: 768px) {
     .hamburger {
-        display: flex; /* Show hamburger icon on small screens */
+        display: flex; 
     }
 
     .nav-buttons {
-        display: none; /* Hide nav buttons by default */
-        flex-direction: column; /* Stack buttons vertically */
-        position: absolute; /* Position menu absolutely */
-        right: 20px; /* Align right */
-        top: 60px; /* Position below navbar */
-        background-color: white; /* Background for dropdown */
-        border: 1px solid #ddd; /* Optional border */
-        width: 150px; /* Set width for dropdown */
-        z-index: 5; /* Ensure it appears above other elements */
+        display: none; 
+        flex-direction: column; 
+        position: absolute; 
+        right: 20px; 
+        top: 60px; 
+        background-color: white; 
+        border: 1px solid #ddd; 
+        width: 150px; 
+        z-index: 5; 
     }
 
     .nav-buttons.active {
-        display: flex; /* Show nav buttons when menu is open */
+        display: flex;
     }
 
     .nav-buttons button {
-        margin: 10px 0; /* Add margin for stacked buttons */
+        margin: 10px 0; 
     }
 }
 </style>
